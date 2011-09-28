@@ -1,0 +1,11 @@
+DISCLAIMER
+==========
+
+RedBarrel is written by Tarek Ziadé <tarek@ziade.org> but anyone is
+welcome to join and contribute.
+
+CONTRIBUTORS
+============
+
+Rémy HUBSCHER <remy.hubscher@ionyse.com>
+Alexis Metaireau <alexis@notmyidea.org>

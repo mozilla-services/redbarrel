@@ -1,0 +1,13 @@
+WebOb
+ply
+Routes
+Mako
+MarkupSafe
+cssmin
+simplejson
+argparse
+WSGIProxy
+gEvent
+gevent-socketio
+pistil
+gunicorn

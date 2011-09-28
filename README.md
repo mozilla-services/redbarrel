@@ -15,9 +15,9 @@ redbarrel
     |      |        |
     |   iPython    Web
     |
-    | -- libs: a list of Python and JS modules
+    | -- modules: a list of Python and JS modules
     |      |
-    |    Library: a sandboxed Python or JS Module
+    |    vmodule: a sandboxed Python or JS Module
     | 
     | -- applications
             |

@@ -1,0 +1,36 @@
+path service (
+    description "A web service that 400 if the body is not json",
+    method POST,
+    use python:redbarrel.demos.post,
+
+    request-description "blah",
+
+    response-status (
+        describe 200 "Success",
+        describe 503 "Problems with looking up the user or sending the email",
+        describe 400 "No email address on file for user",
+        describe 404 "User not found"
+
+    ),
+
+    request-body (
+        unless type is json return 400,
+
+    ),
+
+    request-headers (
+        unless Authorization validates with python:redbarrel.demos.auth return 401
+    ),
+
+    response-headers (
+        set content-type "application/json"
+    ),
+
+    response-body (
+        unless type is json return 503
+    ),
+    url /post,
+
+);
+
+

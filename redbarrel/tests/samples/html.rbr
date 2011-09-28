@@ -1,0 +1,10 @@
+path html (
+    description "An html page",
+    method GET,
+    url /index.html,
+    use python:redbarrel.demos.html,
+    response-headers (
+        set content-type "text/html"
+    )
+);
+

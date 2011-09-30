@@ -1,4 +1,4 @@
 
 
-def ok():
+def ok(*args):
     return 'ok'

@@ -68,7 +68,7 @@
   <input type="hidden" name="data" id="data" value="EMPTY"/>
  </form>
 
- <div id="editor">${lib.code}</div>
+ <div id="editor">${lib.content}</div>
 
     <script src="/__media__/ace.js" type="text/javascript" charset="utf-8"></script>
     <script src="/__media__/theme-twilight.js" type="text/javascript" charset="utf-8"></script>

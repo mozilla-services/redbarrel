@@ -12,7 +12,7 @@ from webob.exc import HTTPNotFound, HTTPFound
 from webob import Response
 
 from redbarrel.appview import AppView
-from redbarrel.libraries import Library
+from redbarrel.vmodules import VirtualModule
 
 from mako.template import Template
 from webob import Response
@@ -79,7 +79,14 @@ class WebApp(object):
         libs = []
         for element in os.listdir(self.libdir):
             path = os.path.join(self.libdir, element)
-            libs.append(Library(path))
+            name = os.path.split(path)[-1]
+            name, ext = os.path.splitext(name)
+            type_ = ext[1:]
+
+            with open(path) as f:
+                content = f.read()
+
+            libs.append(VirtualModule(name, content, type_))
         return libs
 
     def _media(self, request):
@@ -153,7 +160,7 @@ class WebApp(object):
                 code = file_.file.read()
             else:
                 code = ''
-            self.libraries.append(Library(code, name))
+            self.libraries.append(VirtualModule(name, code))
             # XXX
             url = 'http://%s/__lib__/%s' % (request.environ['HTTP_HOST'], name)
             return HTTPFound(location=url)

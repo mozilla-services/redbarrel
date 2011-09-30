@@ -48,19 +48,32 @@ from redbarrel.dsl.lexer import *   # NOQA
 # classes that represent AST nodes
 #
 
+# meh
+prefixes = ('python:', 'file:', 'directory:', 'proxy:', '/')
+
+
 class BaseToken(object):
     def _typ(self, attr):
+        # meh... XXX
         if isinstance(attr, str):
+            for prefix in prefixes:
+                if attr.startswith(prefix):
+                    return attr
             return '"%s"' % attr
         return attr
 
-    def _col(self, attr, no_typing=False):
+    def _col(self, attr, no_typing=False, level=0):
         if not hasattr(attr, 'collapse'):
             if no_typing:
-                return attr
+                res = attr
             else:
-                return self._typ(attr)
-        return attr.collapse()
+                res = self._typ(attr)
+            if level > 0:
+                return ' ' * level + str(res)
+            else:
+                return res
+
+        return attr.collapse(level + 1)
 
 
 class Value(BaseToken):
@@ -68,8 +81,8 @@ class Value(BaseToken):
         self.type = 'val'
         self.value = value
 
-    def collapse(self):
-        return self._col(self.value)
+    def collapse(self, level=0):
+        return self._col(self.value, level=level)
 
 
 class Statement(BaseToken):
@@ -82,32 +95,59 @@ class Statement(BaseToken):
         self.left = left
         self.right = right
 
-    def collapse(self):
-        return self.pattern % (self._col(self.left, True),
-                               self._col(self.right))
+    def collapse(self, level=0):
+        right = str(self._col(self.right)).lstrip()
+        return ' ' * level + self.pattern % (self._col(self.left, True),
+                                             right)
 
     def __str__(self):
         return self.description % (self._col(self.left),
                                    self._col(self.right))
 
 
+class Definition(Statement):
+    type = 'def'
+    pattern = 'path %s (\n%s\n);\n'
+
+    def collapse(self, level=0):
+        indent = ' ' * (level + 1)
+        right = indent + str(self._col(self.right)).lstrip()
+        left = self._col(self.left, True)
+        res = self.pattern % (left, right)
+        return res
+
+class Statements(Statement):
+    pattern = '%s (\n%s\n)'
+
+    def collapse(self, level=0):
+        indent = ' ' * (level + 1)
+        res = self.pattern % (
+              self._col(self.left, True, level=level),
+              self._col(self.right, level=level))
+
+        #indent + self._col(self.right, level=level))
+        res = res.replace('\n', '\n' + indent)
+        return res
+
+
 class Global(Statement):
-    pattern = 'global %s %s;'
+    pattern = 'global %s %s;\n'
     type = 'global'
 
 
 class Type(Statement):
-    pattern = 'type %s %s;'
+    pattern = 'type %s %s;\n'
     type = 'type'
-
+    def _typ(self, attr):
+        return attr
 
 class Worker(Statement):
-    pattern = 'worker %s %s;'
+    pattern = 'worker %s %s;\n'
     type = 'worker'
 
 
 class Arbiter(Statement):
-    pattern = 'arbiter %s %s;'
+    pattern = 'arbiter %s %s;\n'
     type = 'arbiter'
 
 
@@ -119,13 +159,13 @@ class Variable(object):
     def __init__(self, value):
         self.value = value
 
-    def _col(self, value):
+    def _col(self, value, level=0):
         if hasattr(value, 'collapse'):
             return self.value.collapse()
-        return str(self.value)
+        return ' ' * level + str(self.value)
 
-    def collapse(self):
-        return self.pattern % self._col(self.value)
+    def collapse(self, level=0):
+        return ' ' * level + self.pattern % self._col(self.value)
 
     def __str__(self):
         return self.description % self._col(self.value)
@@ -145,10 +185,6 @@ class Root(Variable):
     type = 'root'
     pattern = 'root %s;'
 
-
-class Definition(Statement):
-    type = 'def'
-    pattern = 'path %s (\n%s\n);'
 
 
 class TypeChecker(Statement):
@@ -188,15 +224,16 @@ class CheckNotType(object):
         self.type = type
         self.code = code
 
-    def _col(self, attr):
+    def _col(self, attr, level=0):
         if not hasattr(attr, 'collapse'):
-            return str(attr)
-        return attr.collapse()
+            return ' ' * level + str(attr)
+        return attr.collapse(level=level)
 
-    def collapse(self):
-        return self.pattern % (self._col(self.name),
+    def collapse(self, level):
+        return (' ' * level +
+                self.pattern % (self._col(self.name),
                                self._col(self.type),
-                               self._col(self.code))
+                               self._col(self.code)))
 
     def __str__(self):
         return self.description % (self._col(self.name),
@@ -232,18 +269,24 @@ class Verb(object):
         self.type = 'verb'
         self.verb = verb
 
-    def collapse(self):
-        return self.verb
+    def collapse(self, level=0):
+        return ' ' * level + self.verb
 
     def __str__(self):
         return self.verb
 
 
 class Verbs(list):
-    def collapse(self):
-        return '|'.join([verb.collapse() for verb in self])
+    def collapse(self, level=0):
+        return ' ' * level + '|'.join([verb.collapse() for verb in self])
 
 
+
+class Tokens(list):
+    def collapse(self, level=0):
+        indent = ' ' * level
+        lines = [indent + node.collapse().lstrip() for node in self]
+        return ',\n'.join(lines)
 
 #
 # The actual parser
@@ -260,7 +303,7 @@ def p_path_definitions(p):
                    | definitions definition
     """
     if len(p) == 1:
-        p[0] = list()
+        p[0] = Tokens()
     else:
         p[1].append(p[2])
         p[0] = p[1]
@@ -299,11 +342,12 @@ def p_statements(p):
                   | statement
     """
     if len(p) == 2:
-        p[0] = [p[1]]
+        p[0] = Tokens([p[1]])
     elif len(p) == 3:
         p[0] = p[1]
     else:
-        p[0] = p[1] + [p[3]]
+        p[1].append(p[3])
+        p[0] = p[1]
 
 
 def p_values(p):
@@ -312,11 +356,12 @@ def p_values(p):
               | values COMMA
     """
     if len(p) == 2:
-        p[0] = [p[1]]
+        p[0] = Tokens([p[1]])
     elif len(p) == 3:
         p[0] = p[1]
     else:
-        p[0] = p[1] + [p[3]]
+        p[1].append(p[3])
+        p[0] = p[1]
 
 
 def p_command(p):
@@ -400,7 +445,7 @@ def p_statement(p):
                  | DESCRIPTION TEXT
     """
     if p[2] == '(':
-        p[0] = Statement(p[1], p[3])
+        p[0] = Statements(p[1], p[3])
     else:
         p[0] = Statement(p[1], p[2])
 

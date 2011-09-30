@@ -1,9 +1,8 @@
 path stuff (
-    response-status (
-        describe 200 "success",
-        describe 503 "problem",
-        describe 400 "bad request",
-        describe 404 "user not found",
-    ),
+ response-status (
+  describe 200 "success",
+  describe 503 "problem",
+  describe 400 "bad request",
+  describe 404 "user not found"
+ )
 );
-

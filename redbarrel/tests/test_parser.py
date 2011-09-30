@@ -14,18 +14,27 @@ _SAMPLES = os.path.join(os.path.dirname(__file__), 'samples')
 
 class TestParser(unittest.TestCase):
 
-    def test_files(self):
-        # test some files
+    def _rbrs(self):
         for path in os.listdir(_SAMPLES):
             if os.path.splitext(path)[-1] != '.rbr':
                 continue
 
-            fullpath = os.path.join(_SAMPLES, path)
+            yield os.path.join(_SAMPLES, path)
+
+    def test_files(self):
+        for fullpath in self._rbrs():
             with open(fullpath) as f:
                 ast = build_ast(f.read())
 
             if ast is None:
                 raise AssertionError(fullpath)
+
+    def test_collapse(self):
+        for fullpath in self._rbrs():
+            with open(fullpath) as f:
+                dsl = f.read()
+                ast = build_ast(dsl)
+            self.assertEquals(ast.collapse(), dsl)
 
     def test_several(self):
         path = os.path.join(_SAMPLES, 'service.rbr')
@@ -56,5 +65,5 @@ class TestParser(unittest.TestCase):
 
         # we have a single assignement
         content_type = response_headers[0]
-        self.assertEqual(content_type.collapse(),
+        self.assertEqual(content_type.collapse(level=-1),
                          'set content-type "text/html"')

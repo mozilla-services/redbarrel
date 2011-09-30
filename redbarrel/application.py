@@ -7,7 +7,7 @@ import os
 import copy
 
 from redbarrel import logger
-from redbarrel.dsl.parser import build_ast
+from redbarrel.dsl import build_ast
 from redbarrel.dsl.runners import resolve_runner, get_runner_names
 from redbarrel.dsl.mapper import WebMapper
 

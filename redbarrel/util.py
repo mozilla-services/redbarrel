@@ -25,8 +25,10 @@ def check_syntax(args=None):
     parser.add_argument('path', type=str, help='Path of the RBR file')
     parser.add_argument('--verbose', action='store_true')
     args = parser.parse_args(args=args)
-    from redbarrel.dsl.parser import build_ast
-    res = build_ast(args.path, args.verbose)
+    from redbarrel.dsl import build_ast
+    with open(args.path) as f:
+        res = build_ast(f.read(), args.verbose)
+
     if res is None:
         print("Syntax Error.")
         sys.exit(1)
@@ -105,14 +107,16 @@ def _run_server(args):
     logger.info("Serving on port %d..." % args.port)
 
     # loading the rbr to get the workers/arbiters
-    from redbarrel.dsl.parser import build_ast
+    from redbarrel.dsl import build_ast
     from redbarrel.dsl.runners import resolve_runner
 
     workers = {}
     arbiters = {}
 
     for path in args.path:
-        ast = build_ast(path)
+        with open(path) as f:
+            ast = build_ast(f.read())
+
         for definition in ast:
             type_ = definition.type
             if type_ not in ('worker', 'arbiter'):

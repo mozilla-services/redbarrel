@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-    defines the logger.
+    Contains the pistil server + workervarious helpers.
 
     :copyright: Copyright 2011 by the RedBarrel team, see AUTHORS.
     :license: BSD, see LICENSE for details.
 """
-import logging
+from gevent import monkey
 
-logger = logging.getLogger('redbarrel')
+monkey.noisy = False
+monkey.patch_all()

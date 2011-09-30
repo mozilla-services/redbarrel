@@ -1,0 +1,39 @@
+meta (
+    description "A Realtime monitor",
+    title "RedBarrel Demos"
+);
+
+# the socket service
+path socketio (
+    method GET|POST,
+    url /socket.io/{transport:.*?},
+    use python:redbarrel.demos.rtmonitor.rtmonitor.main
+);
+
+
+#
+# all media + the html page
+#
+path media (
+    method GET,
+    url /js/{name},
+    use directory:media
+);
+
+path media2 (
+    method GET,
+    url /flot/{name},
+    use directory:media/flot
+);
+
+path monitor_html (
+    method GET,
+    url /,
+    # the content type is automatically set here
+    use file:monitor.html,
+    response-body (
+      alter with python:redbarrel.demos.rtmonitor.rtmonitor.convert_template
+    )
+);
+
+

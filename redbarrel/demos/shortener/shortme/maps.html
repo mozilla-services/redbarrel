@@ -1,0 +1,62 @@
+<!DOCTYPE html> 
+<html> 
+  <head> 
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" /> 
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/> 
+    <title>Google Maps JavaScript API v3 Example: Marker Simple</title> 
+    <link href="http://code.google.com/apis/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" /> 
+    <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="js/socket.io.js"></script>
+    <script type="text/javascript" src="js/json.js"></script> <!-- for ie -->
+    <script type="text/javascript"> 
+      var socket = new io.Socket('%(SERVER)s', {port:8000});
+      var map;
+
+      function initialize() {
+        var myLatlng = new google.maps.LatLng(-25.363882,131.044922);
+        var myOptions = {
+          zoom: 2,
+          center: myLatlng,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+        map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+        setupSocket();
+      }
+
+    function setupSocket() {
+       socket.connect();
+       
+       // Add a connect listener
+       socket.on('connect', function() {
+           //document.getElementById('status').innerHTML = 'Connected';
+           console.log('Client has connected to the server!');
+       });
+       
+       // Add a connect listener
+       socket.on('message', function(data) {
+         obj = JSON.parse(data);
+
+         var myLatlng = new google.maps.LatLng(obj.latitude, obj.longitude);
+
+         alert(obj.country_name);
+
+         var marker = new google.maps.Marker({
+            position: myLatlng, 
+            map: map,
+            title: obj.url
+         });
+       });
+       
+       // Add a disconnect listener
+       socket.on('disconnect',function() {
+           //document.getElementById('status').innerHTML = 'Disconnected';
+           setTimeout(setupSocket, 2000);
+           console.log('The client has disconnected!');
+       });
+    };
+    </script>
+  </head> 
+  <body onload="initialize()"> 
+    <div id="map_canvas"></div> 
+  </body> 
+</html>

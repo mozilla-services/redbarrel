@@ -1,0 +1,1232 @@
+Created by PLY version 3.4 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> definitions
+Rule 2     definitions -> <empty>
+Rule 3     definitions -> definitions definition
+Rule 4     definition -> PATH NAME LP statements RP SEMI
+Rule 5     definition -> META LP statements RP SEMI
+Rule 6     definition -> GLOBAL NAME value SEMI
+Rule 7     definition -> TYPE NAME PREFIXED_NAME SEMI
+Rule 8     definition -> SOCKET PREFIXED_NAME SEMI
+Rule 9     statements -> statements COMMA statement
+Rule 10    statements -> statement
+Rule 11    values -> value
+Rule 12    values -> values COMMA value
+Rule 13    command -> UNLESS TYPE IS NAME RETURN CODE
+Rule 14    command -> UNLESS TYPE IS NOT NAME RETURN CODE
+Rule 15    command -> UNLESS NAME TYPE IS NAME RETURN CODE
+Rule 16    command -> UNLESS NAME TYPE IS NOT NAME RETURN CODE
+Rule 17    command -> UNLESS NAME VALIDATES WITH NAME RETURN CODE
+Rule 18    command -> UNLESS NAME VALIDATES WITH PREFIXED_NAME RETURN CODE
+Rule 19    command -> ON ERROR RETURN CODE
+Rule 20    command -> SET NAME value
+Rule 21    command -> DESCRIBE CODE TEXT
+Rule 22    command -> DESCRIPTION TEXT
+Rule 23    command -> ALTER WITH PREFIXED_NAME
+Rule 24    verbs -> VERB
+Rule 25    verbs -> verbs PIPE VERB
+Rule 26    value -> command
+Rule 27    value -> INT
+Rule 28    value -> FLOAT
+Rule 29    value -> verbs
+Rule 30    value -> URLVALUE
+Rule 31    value -> TEXT
+Rule 32    value -> FILE
+Rule 33    value -> DIRECTORY
+Rule 34    value -> PROXY
+Rule 35    value -> DOTTED_NAME
+Rule 36    value -> PREFIXED_NAME
+Rule 37    variable -> METHOD
+Rule 38    variable -> URL
+Rule 39    variable -> NAME
+Rule 40    statement -> variable LP values RP
+Rule 41    statement -> variable value
+Rule 42    statement -> DESCRIPTION TEXT
+
+Terminals, with rules where they appear
+
+ALTER                : 23
+CODE                 : 13 14 15 16 17 18 19 21
+COMMA                : 9 12
+DESCRIBE             : 21
+DESCRIPTION          : 22 42
+DIRECTORY            : 33
+DOTTED_NAME          : 35
+ERROR                : 19
+FILE                 : 32
+FLOAT                : 28
+GLOBAL               : 6
+INT                  : 27
+IS                   : 13 14 15 16
+LP                   : 4 5 40
+META                 : 5
+METHOD               : 37
+NAME                 : 4 6 7 13 14 15 15 16 16 17 17 18 20 39
+NOT                  : 14 16
+ON                   : 19
+PATH                 : 4
+PIPE                 : 25
+PREFIXED_NAME        : 7 8 18 23 36
+PROXY                : 34
+RETURN               : 13 14 15 16 17 18 19
+RP                   : 4 5 40
+SEMI                 : 4 5 6 7 8
+SET                  : 20
+SOCKET               : 8
+TEXT                 : 21 22 31 42
+TYPE                 : 7 13 14 15 16
+UNLESS               : 13 14 15 16 17 18
+URL                  : 38
+URLVALUE             : 30
+VALIDATES            : 17 18
+VERB                 : 24 25
+WITH                 : 17 18 23
+error                : 
+
+Nonterminals, with rules where they appear
+
+command              : 26
+definition           : 3
+definitions          : 1 3
+program              : 0
+statement            : 9 10
+statements           : 4 5 9
+value                : 6 11 12 20 41
+values               : 12 40
+variable             : 40 41
+verbs                : 25 29
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . program
+    (1) program -> . definitions
+    (2) definitions -> .
+    (3) definitions -> . definitions definition
+
+    PATH            reduce using rule 2 (definitions -> .)
+    META            reduce using rule 2 (definitions -> .)
+    GLOBAL          reduce using rule 2 (definitions -> .)
+    TYPE            reduce using rule 2 (definitions -> .)
+    SOCKET          reduce using rule 2 (definitions -> .)
+    $end            reduce using rule 2 (definitions -> .)
+
+    definitions                    shift and go to state 1
+    program                        shift and go to state 2
+
+state 1
+
+    (1) program -> definitions .
+    (3) definitions -> definitions . definition
+    (4) definition -> . PATH NAME LP statements RP SEMI
+    (5) definition -> . META LP statements RP SEMI
+    (6) definition -> . GLOBAL NAME value SEMI
+    (7) definition -> . TYPE NAME PREFIXED_NAME SEMI
+    (8) definition -> . SOCKET PREFIXED_NAME SEMI
+
+    $end            reduce using rule 1 (program -> definitions .)
+    PATH            shift and go to state 6
+    META            shift and go to state 5
+    GLOBAL          shift and go to state 4
+    TYPE            shift and go to state 7
+    SOCKET          shift and go to state 8
+
+    definition                     shift and go to state 3
+
+state 2
+
+    (0) S' -> program .
+
+
+
+state 3
+
+    (3) definitions -> definitions definition .
+
+    PATH            reduce using rule 3 (definitions -> definitions definition .)
+    META            reduce using rule 3 (definitions -> definitions definition .)
+    GLOBAL          reduce using rule 3 (definitions -> definitions definition .)
+    TYPE            reduce using rule 3 (definitions -> definitions definition .)
+    SOCKET          reduce using rule 3 (definitions -> definitions definition .)
+    $end            reduce using rule 3 (definitions -> definitions definition .)
+
+
+state 4
+
+    (6) definition -> GLOBAL . NAME value SEMI
+
+    NAME            shift and go to state 9
+
+
+state 5
+
+    (5) definition -> META . LP statements RP SEMI
+
+    LP              shift and go to state 10
+
+
+state 6
+
+    (4) definition -> PATH . NAME LP statements RP SEMI
+
+    NAME            shift and go to state 11
+
+
+state 7
+
+    (7) definition -> TYPE . NAME PREFIXED_NAME SEMI
+
+    NAME            shift and go to state 12
+
+
+state 8
+
+    (8) definition -> SOCKET . PREFIXED_NAME SEMI
+
+    PREFIXED_NAME   shift and go to state 13
+
+
+state 9
+
+    (6) definition -> GLOBAL NAME . value SEMI
+    (26) value -> . command
+    (27) value -> . INT
+    (28) value -> . FLOAT
+    (29) value -> . verbs
+    (30) value -> . URLVALUE
+    (31) value -> . TEXT
+    (32) value -> . FILE
+    (33) value -> . DIRECTORY
+    (34) value -> . PROXY
+    (35) value -> . DOTTED_NAME
+    (36) value -> . PREFIXED_NAME
+    (13) command -> . UNLESS TYPE IS NAME RETURN CODE
+    (14) command -> . UNLESS TYPE IS NOT NAME RETURN CODE
+    (15) command -> . UNLESS NAME TYPE IS NAME RETURN CODE
+    (16) command -> . UNLESS NAME TYPE IS NOT NAME RETURN CODE
+    (17) command -> . UNLESS NAME VALIDATES WITH NAME RETURN CODE
+    (18) command -> . UNLESS NAME VALIDATES WITH PREFIXED_NAME RETURN CODE
+    (19) command -> . ON ERROR RETURN CODE
+    (20) command -> . SET NAME value
+    (21) command -> . DESCRIBE CODE TEXT
+    (22) command -> . DESCRIPTION TEXT
+    (23) command -> . ALTER WITH PREFIXED_NAME
+    (24) verbs -> . VERB
+    (25) verbs -> . verbs PIPE VERB
+
+    INT             shift and go to state 28
+    FLOAT           shift and go to state 30
+    URLVALUE        shift and go to state 23
+    TEXT            shift and go to state 15
+    FILE            shift and go to state 16
+    DIRECTORY       shift and go to state 25
+    PROXY           shift and go to state 20
+    DOTTED_NAME     shift and go to state 14
+    PREFIXED_NAME   shift and go to state 29
+    UNLESS          shift and go to state 22
+    ON              shift and go to state 27
+    SET             shift and go to state 18
+    DESCRIBE        shift and go to state 21
+    DESCRIPTION     shift and go to state 26
+    ALTER           shift and go to state 17
+    VERB            shift and go to state 24
+
+    verbs                          shift and go to state 19
+    command                        shift and go to state 32
+    value                          shift and go to state 31
+
+state 10
+
+    (5) definition -> META LP . statements RP SEMI
+    (9) statements -> . statements COMMA statement
+    (10) statements -> . statement
+    (40) statement -> . variable LP values RP
+    (41) statement -> . variable value
+    (42) statement -> . DESCRIPTION TEXT
+    (37) variable -> . METHOD
+    (38) variable -> . URL
+    (39) variable -> . NAME
+
+    DESCRIPTION     shift and go to state 39
+    METHOD          shift and go to state 38
+    URL             shift and go to state 35
+    NAME            shift and go to state 34
+
+    variable                       shift and go to state 36
+    statements                     shift and go to state 37
+    statement                      shift and go to state 33
+
+state 11
+
+    (4) definition -> PATH NAME . LP statements RP SEMI
+
+    LP              shift and go to state 40
+
+
+state 12
+
+    (7) definition -> TYPE NAME . PREFIXED_NAME SEMI
+
+    PREFIXED_NAME   shift and go to state 41
+
+
+state 13
+
+    (8) definition -> SOCKET PREFIXED_NAME . SEMI
+
+    SEMI            shift and go to state 42
+
+
+state 14
+
+    (35) value -> DOTTED_NAME .
+
+    SEMI            reduce using rule 35 (value -> DOTTED_NAME .)
+    RP              reduce using rule 35 (value -> DOTTED_NAME .)
+    COMMA           reduce using rule 35 (value -> DOTTED_NAME .)
+
+
+state 15
+
+    (31) value -> TEXT .
+
+    SEMI            reduce using rule 31 (value -> TEXT .)
+    RP              reduce using rule 31 (value -> TEXT .)
+    COMMA           reduce using rule 31 (value -> TEXT .)
+
+
+state 16
+
+    (32) value -> FILE .
+
+    SEMI            reduce using rule 32 (value -> FILE .)
+    RP              reduce using rule 32 (value -> FILE .)
+    COMMA           reduce using rule 32 (value -> FILE .)
+
+
+state 17
+
+    (23) command -> ALTER . WITH PREFIXED_NAME
+
+    WITH            shift and go to state 43
+
+
+state 18
+
+    (20) command -> SET . NAME value
+
+    NAME            shift and go to state 44
+
+
+state 19
+
+    (29) value -> verbs .
+    (25) verbs -> verbs . PIPE VERB
+
+    SEMI            reduce using rule 29 (value -> verbs .)
+    RP              reduce using rule 29 (value -> verbs .)
+    COMMA           reduce using rule 29 (value -> verbs .)
+    PIPE            shift and go to state 45
+
+
+state 20
+
+    (34) value -> PROXY .
+
+    SEMI            reduce using rule 34 (value -> PROXY .)
+    RP              reduce using rule 34 (value -> PROXY .)
+    COMMA           reduce using rule 34 (value -> PROXY .)
+
+
+state 21
+
+    (21) command -> DESCRIBE . CODE TEXT
+
+    CODE            shift and go to state 46
+
+
+state 22
+
+    (13) command -> UNLESS . TYPE IS NAME RETURN CODE
+    (14) command -> UNLESS . TYPE IS NOT NAME RETURN CODE
+    (15) command -> UNLESS . NAME TYPE IS NAME RETURN CODE
+    (16) command -> UNLESS . NAME TYPE IS NOT NAME RETURN CODE
+    (17) command -> UNLESS . NAME VALIDATES WITH NAME RETURN CODE
+    (18) command -> UNLESS . NAME VALIDATES WITH PREFIXED_NAME RETURN CODE
+
+    TYPE            shift and go to state 48
+    NAME            shift and go to state 47
+
+
+state 23
+
+    (30) value -> URLVALUE .
+
+    SEMI            reduce using rule 30 (value -> URLVALUE .)
+    RP              reduce using rule 30 (value -> URLVALUE .)
+    COMMA           reduce using rule 30 (value -> URLVALUE .)
+
+
+state 24
+
+    (24) verbs -> VERB .
+
+    PIPE            reduce using rule 24 (verbs -> VERB .)
+    SEMI            reduce using rule 24 (verbs -> VERB .)
+    RP              reduce using rule 24 (verbs -> VERB .)
+    COMMA           reduce using rule 24 (verbs -> VERB .)
+
+
+state 25
+
+    (33) value -> DIRECTORY .
+
+    SEMI            reduce using rule 33 (value -> DIRECTORY .)
+    RP              reduce using rule 33 (value -> DIRECTORY .)
+    COMMA           reduce using rule 33 (value -> DIRECTORY .)
+
+
+state 26
+
+    (22) command -> DESCRIPTION . TEXT
+
+    TEXT            shift and go to state 49
+
+
+state 27
+
+    (19) command -> ON . ERROR RETURN CODE
+
+    ERROR           shift and go to state 50
+
+
+state 28
+
+    (27) value -> INT .
+
+    SEMI            reduce using rule 27 (value -> INT .)
+    RP              reduce using rule 27 (value -> INT .)
+    COMMA           reduce using rule 27 (value -> INT .)
+
+
+state 29
+
+    (36) value -> PREFIXED_NAME .
+
+    SEMI            reduce using rule 36 (value -> PREFIXED_NAME .)
+    RP              reduce using rule 36 (value -> PREFIXED_NAME .)
+    COMMA           reduce using rule 36 (value -> PREFIXED_NAME .)
+
+
+state 30
+
+    (28) value -> FLOAT .
+
+    SEMI            reduce using rule 28 (value -> FLOAT .)
+    RP              reduce using rule 28 (value -> FLOAT .)
+    COMMA           reduce using rule 28 (value -> FLOAT .)
+
+
+state 31
+
+    (6) definition -> GLOBAL NAME value . SEMI
+
+    SEMI            shift and go to state 51
+
+
+state 32
+
+    (26) value -> command .
+
+    SEMI            reduce using rule 26 (value -> command .)
+    RP              reduce using rule 26 (value -> command .)
+    COMMA           reduce using rule 26 (value -> command .)
+
+
+state 33
+
+    (10) statements -> statement .
+
+    RP              reduce using rule 10 (statements -> statement .)
+    COMMA           reduce using rule 10 (statements -> statement .)
+
+
+state 34
+
+    (39) variable -> NAME .
+
+    LP              reduce using rule 39 (variable -> NAME .)
+    INT             reduce using rule 39 (variable -> NAME .)
+    FLOAT           reduce using rule 39 (variable -> NAME .)
+    URLVALUE        reduce using rule 39 (variable -> NAME .)
+    TEXT            reduce using rule 39 (variable -> NAME .)
+    FILE            reduce using rule 39 (variable -> NAME .)
+    DIRECTORY       reduce using rule 39 (variable -> NAME .)
+    PROXY           reduce using rule 39 (variable -> NAME .)
+    DOTTED_NAME     reduce using rule 39 (variable -> NAME .)
+    PREFIXED_NAME   reduce using rule 39 (variable -> NAME .)
+    UNLESS          reduce using rule 39 (variable -> NAME .)
+    ON              reduce using rule 39 (variable -> NAME .)
+    SET             reduce using rule 39 (variable -> NAME .)
+    DESCRIBE        reduce using rule 39 (variable -> NAME .)
+    DESCRIPTION     reduce using rule 39 (variable -> NAME .)
+    ALTER           reduce using rule 39 (variable -> NAME .)
+    VERB            reduce using rule 39 (variable -> NAME .)
+
+
+state 35
+
+    (38) variable -> URL .
+
+    LP              reduce using rule 38 (variable -> URL .)
+    INT             reduce using rule 38 (variable -> URL .)
+    FLOAT           reduce using rule 38 (variable -> URL .)
+    URLVALUE        reduce using rule 38 (variable -> URL .)
+    TEXT            reduce using rule 38 (variable -> URL .)
+    FILE            reduce using rule 38 (variable -> URL .)
+    DIRECTORY       reduce using rule 38 (variable -> URL .)
+    PROXY           reduce using rule 38 (variable -> URL .)
+    DOTTED_NAME     reduce using rule 38 (variable -> URL .)
+    PREFIXED_NAME   reduce using rule 38 (variable -> URL .)
+    UNLESS          reduce using rule 38 (variable -> URL .)
+    ON              reduce using rule 38 (variable -> URL .)
+    SET             reduce using rule 38 (variable -> URL .)
+    DESCRIBE        reduce using rule 38 (variable -> URL .)
+    DESCRIPTION     reduce using rule 38 (variable -> URL .)
+    ALTER           reduce using rule 38 (variable -> URL .)
+    VERB            reduce using rule 38 (variable -> URL .)
+
+
+state 36
+
+    (40) statement -> variable . LP values RP
+    (41) statement -> variable . value
+    (26) value -> . command
+    (27) value -> . INT
+    (28) value -> . FLOAT
+    (29) value -> . verbs
+    (30) value -> . URLVALUE
+    (31) value -> . TEXT
+    (32) value -> . FILE
+    (33) value -> . DIRECTORY
+    (34) value -> . PROXY
+    (35) value -> . DOTTED_NAME
+    (36) value -> . PREFIXED_NAME
+    (13) command -> . UNLESS TYPE IS NAME RETURN CODE
+    (14) command -> . UNLESS TYPE IS NOT NAME RETURN CODE
+    (15) command -> . UNLESS NAME TYPE IS NAME RETURN CODE
+    (16) command -> . UNLESS NAME TYPE IS NOT NAME RETURN CODE
+    (17) command -> . UNLESS NAME VALIDATES WITH NAME RETURN CODE
+    (18) command -> . UNLESS NAME VALIDATES WITH PREFIXED_NAME RETURN CODE
+    (19) command -> . ON ERROR RETURN CODE
+    (20) command -> . SET NAME value
+    (21) command -> . DESCRIBE CODE TEXT
+    (22) command -> . DESCRIPTION TEXT
+    (23) command -> . ALTER WITH PREFIXED_NAME
+    (24) verbs -> . VERB
+    (25) verbs -> . verbs PIPE VERB
+
+    LP              shift and go to state 52
+    INT             shift and go to state 28
+    FLOAT           shift and go to state 30
+    URLVALUE        shift and go to state 23
+    TEXT            shift and go to state 15
+    FILE            shift and go to state 16
+    DIRECTORY       shift and go to state 25
+    PROXY           shift and go to state 20
+    DOTTED_NAME     shift and go to state 14
+    PREFIXED_NAME   shift and go to state 29
+    UNLESS          shift and go to state 22
+    ON              shift and go to state 27
+    SET             shift and go to state 18
+    DESCRIBE        shift and go to state 21
+    DESCRIPTION     shift and go to state 26
+    ALTER           shift and go to state 17
+    VERB            shift and go to state 24
+
+    command                        shift and go to state 32
+    verbs                          shift and go to state 19
+    value                          shift and go to state 53
+
+state 37
+
+    (5) definition -> META LP statements . RP SEMI
+    (9) statements -> statements . COMMA statement
+
+    RP              shift and go to state 54
+    COMMA           shift and go to state 55
+
+
+state 38
+
+    (37) variable -> METHOD .
+
+    LP              reduce using rule 37 (variable -> METHOD .)
+    INT             reduce using rule 37 (variable -> METHOD .)
+    FLOAT           reduce using rule 37 (variable -> METHOD .)
+    URLVALUE        reduce using rule 37 (variable -> METHOD .)
+    TEXT            reduce using rule 37 (variable -> METHOD .)
+    FILE            reduce using rule 37 (variable -> METHOD .)
+    DIRECTORY       reduce using rule 37 (variable -> METHOD .)
+    PROXY           reduce using rule 37 (variable -> METHOD .)
+    DOTTED_NAME     reduce using rule 37 (variable -> METHOD .)
+    PREFIXED_NAME   reduce using rule 37 (variable -> METHOD .)
+    UNLESS          reduce using rule 37 (variable -> METHOD .)
+    ON              reduce using rule 37 (variable -> METHOD .)
+    SET             reduce using rule 37 (variable -> METHOD .)
+    DESCRIBE        reduce using rule 37 (variable -> METHOD .)
+    DESCRIPTION     reduce using rule 37 (variable -> METHOD .)
+    ALTER           reduce using rule 37 (variable -> METHOD .)
+    VERB            reduce using rule 37 (variable -> METHOD .)
+
+
+state 39
+
+    (42) statement -> DESCRIPTION . TEXT
+
+    TEXT            shift and go to state 56
+
+
+state 40
+
+    (4) definition -> PATH NAME LP . statements RP SEMI
+    (9) statements -> . statements COMMA statement
+    (10) statements -> . statement
+    (40) statement -> . variable LP values RP
+    (41) statement -> . variable value
+    (42) statement -> . DESCRIPTION TEXT
+    (37) variable -> . METHOD
+    (38) variable -> . URL
+    (39) variable -> . NAME
+
+    DESCRIPTION     shift and go to state 39
+    METHOD          shift and go to state 38
+    URL             shift and go to state 35
+    NAME            shift and go to state 34
+
+    variable                       shift and go to state 36
+    statements                     shift and go to state 57
+    statement                      shift and go to state 33
+
+state 41
+
+    (7) definition -> TYPE NAME PREFIXED_NAME . SEMI
+
+    SEMI            shift and go to state 58
+
+
+state 42
+
+    (8) definition -> SOCKET PREFIXED_NAME SEMI .
+
+    PATH            reduce using rule 8 (definition -> SOCKET PREFIXED_NAME SEMI .)
+    META            reduce using rule 8 (definition -> SOCKET PREFIXED_NAME SEMI .)
+    GLOBAL          reduce using rule 8 (definition -> SOCKET PREFIXED_NAME SEMI .)
+    TYPE            reduce using rule 8 (definition -> SOCKET PREFIXED_NAME SEMI .)
+    SOCKET          reduce using rule 8 (definition -> SOCKET PREFIXED_NAME SEMI .)
+    $end            reduce using rule 8 (definition -> SOCKET PREFIXED_NAME SEMI .)
+
+
+state 43
+
+    (23) command -> ALTER WITH . PREFIXED_NAME
+
+    PREFIXED_NAME   shift and go to state 59
+
+
+state 44
+
+    (20) command -> SET NAME . value
+    (26) value -> . command
+    (27) value -> . INT
+    (28) value -> . FLOAT
+    (29) value -> . verbs
+    (30) value -> . URLVALUE
+    (31) value -> . TEXT
+    (32) value -> . FILE
+    (33) value -> . DIRECTORY
+    (34) value -> . PROXY
+    (35) value -> . DOTTED_NAME
+    (36) value -> . PREFIXED_NAME
+    (13) command -> . UNLESS TYPE IS NAME RETURN CODE
+    (14) command -> . UNLESS TYPE IS NOT NAME RETURN CODE
+    (15) command -> . UNLESS NAME TYPE IS NAME RETURN CODE
+    (16) command -> . UNLESS NAME TYPE IS NOT NAME RETURN CODE
+    (17) command -> . UNLESS NAME VALIDATES WITH NAME RETURN CODE
+    (18) command -> . UNLESS NAME VALIDATES WITH PREFIXED_NAME RETURN CODE
+    (19) command -> . ON ERROR RETURN CODE
+    (20) command -> . SET NAME value
+    (21) command -> . DESCRIBE CODE TEXT
+    (22) command -> . DESCRIPTION TEXT
+    (23) command -> . ALTER WITH PREFIXED_NAME
+    (24) verbs -> . VERB
+    (25) verbs -> . verbs PIPE VERB
+
+    INT             shift and go to state 28
+    FLOAT           shift and go to state 30
+    URLVALUE        shift and go to state 23
+    TEXT            shift and go to state 15
+    FILE            shift and go to state 16
+    DIRECTORY       shift and go to state 25
+    PROXY           shift and go to state 20
+    DOTTED_NAME     shift and go to state 14
+    PREFIXED_NAME   shift and go to state 29
+    UNLESS          shift and go to state 22
+    ON              shift and go to state 27
+    SET             shift and go to state 18
+    DESCRIBE        shift and go to state 21
+    DESCRIPTION     shift and go to state 26
+    ALTER           shift and go to state 17
+    VERB            shift and go to state 24
+
+    verbs                          shift and go to state 19
+    command                        shift and go to state 32
+    value                          shift and go to state 60
+
+state 45
+
+    (25) verbs -> verbs PIPE . VERB
+
+    VERB            shift and go to state 61
+
+
+state 46
+
+    (21) command -> DESCRIBE CODE . TEXT
+
+    TEXT            shift and go to state 62
+
+
+state 47
+
+    (15) command -> UNLESS NAME . TYPE IS NAME RETURN CODE
+    (16) command -> UNLESS NAME . TYPE IS NOT NAME RETURN CODE
+    (17) command -> UNLESS NAME . VALIDATES WITH NAME RETURN CODE
+    (18) command -> UNLESS NAME . VALIDATES WITH PREFIXED_NAME RETURN CODE
+
+    TYPE            shift and go to state 64
+    VALIDATES       shift and go to state 63
+
+
+state 48
+
+    (13) command -> UNLESS TYPE . IS NAME RETURN CODE
+    (14) command -> UNLESS TYPE . IS NOT NAME RETURN CODE
+
+    IS              shift and go to state 65
+
+
+state 49
+
+    (22) command -> DESCRIPTION TEXT .
+
+    RP              reduce using rule 22 (command -> DESCRIPTION TEXT .)
+    COMMA           reduce using rule 22 (command -> DESCRIPTION TEXT .)
+    SEMI            reduce using rule 22 (command -> DESCRIPTION TEXT .)
+
+
+state 50
+
+    (19) command -> ON ERROR . RETURN CODE
+
+    RETURN          shift and go to state 66
+
+
+state 51
+
+    (6) definition -> GLOBAL NAME value SEMI .
+
+    PATH            reduce using rule 6 (definition -> GLOBAL NAME value SEMI .)
+    META            reduce using rule 6 (definition -> GLOBAL NAME value SEMI .)
+    GLOBAL          reduce using rule 6 (definition -> GLOBAL NAME value SEMI .)
+    TYPE            reduce using rule 6 (definition -> GLOBAL NAME value SEMI .)
+    SOCKET          reduce using rule 6 (definition -> GLOBAL NAME value SEMI .)
+    $end            reduce using rule 6 (definition -> GLOBAL NAME value SEMI .)
+
+
+state 52
+
+    (40) statement -> variable LP . values RP
+    (11) values -> . value
+    (12) values -> . values COMMA value
+    (26) value -> . command
+    (27) value -> . INT
+    (28) value -> . FLOAT
+    (29) value -> . verbs
+    (30) value -> . URLVALUE
+    (31) value -> . TEXT
+    (32) value -> . FILE
+    (33) value -> . DIRECTORY
+    (34) value -> . PROXY
+    (35) value -> . DOTTED_NAME
+    (36) value -> . PREFIXED_NAME
+    (13) command -> . UNLESS TYPE IS NAME RETURN CODE
+    (14) command -> . UNLESS TYPE IS NOT NAME RETURN CODE
+    (15) command -> . UNLESS NAME TYPE IS NAME RETURN CODE
+    (16) command -> . UNLESS NAME TYPE IS NOT NAME RETURN CODE
+    (17) command -> . UNLESS NAME VALIDATES WITH NAME RETURN CODE
+    (18) command -> . UNLESS NAME VALIDATES WITH PREFIXED_NAME RETURN CODE
+    (19) command -> . ON ERROR RETURN CODE
+    (20) command -> . SET NAME value
+    (21) command -> . DESCRIBE CODE TEXT
+    (22) command -> . DESCRIPTION TEXT
+    (23) command -> . ALTER WITH PREFIXED_NAME
+    (24) verbs -> . VERB
+    (25) verbs -> . verbs PIPE VERB
+
+    INT             shift and go to state 28
+    FLOAT           shift and go to state 30
+    URLVALUE        shift and go to state 23
+    TEXT            shift and go to state 15
+    FILE            shift and go to state 16
+    DIRECTORY       shift and go to state 25
+    PROXY           shift and go to state 20
+    DOTTED_NAME     shift and go to state 14
+    PREFIXED_NAME   shift and go to state 29
+    UNLESS          shift and go to state 22
+    ON              shift and go to state 27
+    SET             shift and go to state 18
+    DESCRIBE        shift and go to state 21
+    DESCRIPTION     shift and go to state 26
+    ALTER           shift and go to state 17
+    VERB            shift and go to state 24
+
+    command                        shift and go to state 32
+    verbs                          shift and go to state 19
+    values                         shift and go to state 67
+    value                          shift and go to state 68
+
+state 53
+
+    (41) statement -> variable value .
+
+    RP              reduce using rule 41 (statement -> variable value .)
+    COMMA           reduce using rule 41 (statement -> variable value .)
+
+
+state 54
+
+    (5) definition -> META LP statements RP . SEMI
+
+    SEMI            shift and go to state 69
+
+
+state 55
+
+    (9) statements -> statements COMMA . statement
+    (40) statement -> . variable LP values RP
+    (41) statement -> . variable value
+    (42) statement -> . DESCRIPTION TEXT
+    (37) variable -> . METHOD
+    (38) variable -> . URL
+    (39) variable -> . NAME
+
+    DESCRIPTION     shift and go to state 39
+    METHOD          shift and go to state 38
+    URL             shift and go to state 35
+    NAME            shift and go to state 34
+
+    variable                       shift and go to state 36
+    statement                      shift and go to state 70
+
+state 56
+
+    (42) statement -> DESCRIPTION TEXT .
+
+    RP              reduce using rule 42 (statement -> DESCRIPTION TEXT .)
+    COMMA           reduce using rule 42 (statement -> DESCRIPTION TEXT .)
+
+
+state 57
+
+    (4) definition -> PATH NAME LP statements . RP SEMI
+    (9) statements -> statements . COMMA statement
+
+    RP              shift and go to state 71
+    COMMA           shift and go to state 55
+
+
+state 58
+
+    (7) definition -> TYPE NAME PREFIXED_NAME SEMI .
+
+    PATH            reduce using rule 7 (definition -> TYPE NAME PREFIXED_NAME SEMI .)
+    META            reduce using rule 7 (definition -> TYPE NAME PREFIXED_NAME SEMI .)
+    GLOBAL          reduce using rule 7 (definition -> TYPE NAME PREFIXED_NAME SEMI .)
+    TYPE            reduce using rule 7 (definition -> TYPE NAME PREFIXED_NAME SEMI .)
+    SOCKET          reduce using rule 7 (definition -> TYPE NAME PREFIXED_NAME SEMI .)
+    $end            reduce using rule 7 (definition -> TYPE NAME PREFIXED_NAME SEMI .)
+
+
+state 59
+
+    (23) command -> ALTER WITH PREFIXED_NAME .
+
+    RP              reduce using rule 23 (command -> ALTER WITH PREFIXED_NAME .)
+    COMMA           reduce using rule 23 (command -> ALTER WITH PREFIXED_NAME .)
+    SEMI            reduce using rule 23 (command -> ALTER WITH PREFIXED_NAME .)
+
+
+state 60
+
+    (20) command -> SET NAME value .
+
+    RP              reduce using rule 20 (command -> SET NAME value .)
+    COMMA           reduce using rule 20 (command -> SET NAME value .)
+    SEMI            reduce using rule 20 (command -> SET NAME value .)
+
+
+state 61
+
+    (25) verbs -> verbs PIPE VERB .
+
+    PIPE            reduce using rule 25 (verbs -> verbs PIPE VERB .)
+    SEMI            reduce using rule 25 (verbs -> verbs PIPE VERB .)
+    RP              reduce using rule 25 (verbs -> verbs PIPE VERB .)
+    COMMA           reduce using rule 25 (verbs -> verbs PIPE VERB .)
+
+
+state 62
+
+    (21) command -> DESCRIBE CODE TEXT .
+
+    RP              reduce using rule 21 (command -> DESCRIBE CODE TEXT .)
+    COMMA           reduce using rule 21 (command -> DESCRIBE CODE TEXT .)
+    SEMI            reduce using rule 21 (command -> DESCRIBE CODE TEXT .)
+
+
+state 63
+
+    (17) command -> UNLESS NAME VALIDATES . WITH NAME RETURN CODE
+    (18) command -> UNLESS NAME VALIDATES . WITH PREFIXED_NAME RETURN CODE
+
+    WITH            shift and go to state 72
+
+
+state 64
+
+    (15) command -> UNLESS NAME TYPE . IS NAME RETURN CODE
+    (16) command -> UNLESS NAME TYPE . IS NOT NAME RETURN CODE
+
+    IS              shift and go to state 73
+
+
+state 65
+
+    (13) command -> UNLESS TYPE IS . NAME RETURN CODE
+    (14) command -> UNLESS TYPE IS . NOT NAME RETURN CODE
+
+    NAME            shift and go to state 74
+    NOT             shift and go to state 75
+
+
+state 66
+
+    (19) command -> ON ERROR RETURN . CODE
+
+    CODE            shift and go to state 76
+
+
+state 67
+
+    (40) statement -> variable LP values . RP
+    (12) values -> values . COMMA value
+
+    RP              shift and go to state 77
+    COMMA           shift and go to state 78
+
+
+state 68
+
+    (11) values -> value .
+
+    RP              reduce using rule 11 (values -> value .)
+    COMMA           reduce using rule 11 (values -> value .)
+
+
+state 69
+
+    (5) definition -> META LP statements RP SEMI .
+
+    PATH            reduce using rule 5 (definition -> META LP statements RP SEMI .)
+    META            reduce using rule 5 (definition -> META LP statements RP SEMI .)
+    GLOBAL          reduce using rule 5 (definition -> META LP statements RP SEMI .)
+    TYPE            reduce using rule 5 (definition -> META LP statements RP SEMI .)
+    SOCKET          reduce using rule 5 (definition -> META LP statements RP SEMI .)
+    $end            reduce using rule 5 (definition -> META LP statements RP SEMI .)
+
+
+state 70
+
+    (9) statements -> statements COMMA statement .
+
+    RP              reduce using rule 9 (statements -> statements COMMA statement .)
+    COMMA           reduce using rule 9 (statements -> statements COMMA statement .)
+
+
+state 71
+
+    (4) definition -> PATH NAME LP statements RP . SEMI
+
+    SEMI            shift and go to state 79
+
+
+state 72
+
+    (17) command -> UNLESS NAME VALIDATES WITH . NAME RETURN CODE
+    (18) command -> UNLESS NAME VALIDATES WITH . PREFIXED_NAME RETURN CODE
+
+    NAME            shift and go to state 80
+    PREFIXED_NAME   shift and go to state 81
+
+
+state 73
+
+    (15) command -> UNLESS NAME TYPE IS . NAME RETURN CODE
+    (16) command -> UNLESS NAME TYPE IS . NOT NAME RETURN CODE
+
+    NAME            shift and go to state 82
+    NOT             shift and go to state 83
+
+
+state 74
+
+    (13) command -> UNLESS TYPE IS NAME . RETURN CODE
+
+    RETURN          shift and go to state 84
+
+
+state 75
+
+    (14) command -> UNLESS TYPE IS NOT . NAME RETURN CODE
+
+    NAME            shift and go to state 85
+
+
+state 76
+
+    (19) command -> ON ERROR RETURN CODE .
+
+    RP              reduce using rule 19 (command -> ON ERROR RETURN CODE .)
+    COMMA           reduce using rule 19 (command -> ON ERROR RETURN CODE .)
+    SEMI            reduce using rule 19 (command -> ON ERROR RETURN CODE .)
+
+
+state 77
+
+    (40) statement -> variable LP values RP .
+
+    RP              reduce using rule 40 (statement -> variable LP values RP .)
+    COMMA           reduce using rule 40 (statement -> variable LP values RP .)
+
+
+state 78
+
+    (12) values -> values COMMA . value
+    (26) value -> . command
+    (27) value -> . INT
+    (28) value -> . FLOAT
+    (29) value -> . verbs
+    (30) value -> . URLVALUE
+    (31) value -> . TEXT
+    (32) value -> . FILE
+    (33) value -> . DIRECTORY
+    (34) value -> . PROXY
+    (35) value -> . DOTTED_NAME
+    (36) value -> . PREFIXED_NAME
+    (13) command -> . UNLESS TYPE IS NAME RETURN CODE
+    (14) command -> . UNLESS TYPE IS NOT NAME RETURN CODE
+    (15) command -> . UNLESS NAME TYPE IS NAME RETURN CODE
+    (16) command -> . UNLESS NAME TYPE IS NOT NAME RETURN CODE
+    (17) command -> . UNLESS NAME VALIDATES WITH NAME RETURN CODE
+    (18) command -> . UNLESS NAME VALIDATES WITH PREFIXED_NAME RETURN CODE
+    (19) command -> . ON ERROR RETURN CODE
+    (20) command -> . SET NAME value
+    (21) command -> . DESCRIBE CODE TEXT
+    (22) command -> . DESCRIPTION TEXT
+    (23) command -> . ALTER WITH PREFIXED_NAME
+    (24) verbs -> . VERB
+    (25) verbs -> . verbs PIPE VERB
+
+    INT             shift and go to state 28
+    FLOAT           shift and go to state 30
+    URLVALUE        shift and go to state 23
+    TEXT            shift and go to state 15
+    FILE            shift and go to state 16
+    DIRECTORY       shift and go to state 25
+    PROXY           shift and go to state 20
+    DOTTED_NAME     shift and go to state 14
+    PREFIXED_NAME   shift and go to state 29
+    UNLESS          shift and go to state 22
+    ON              shift and go to state 27
+    SET             shift and go to state 18
+    DESCRIBE        shift and go to state 21
+    DESCRIPTION     shift and go to state 26
+    ALTER           shift and go to state 17
+    VERB            shift and go to state 24
+
+    command                        shift and go to state 32
+    verbs                          shift and go to state 19
+    value                          shift and go to state 86
+
+state 79
+
+    (4) definition -> PATH NAME LP statements RP SEMI .
+
+    PATH            reduce using rule 4 (definition -> PATH NAME LP statements RP SEMI .)
+    META            reduce using rule 4 (definition -> PATH NAME LP statements RP SEMI .)
+    GLOBAL          reduce using rule 4 (definition -> PATH NAME LP statements RP SEMI .)
+    TYPE            reduce using rule 4 (definition -> PATH NAME LP statements RP SEMI .)
+    SOCKET          reduce using rule 4 (definition -> PATH NAME LP statements RP SEMI .)
+    $end            reduce using rule 4 (definition -> PATH NAME LP statements RP SEMI .)
+
+
+state 80
+
+    (17) command -> UNLESS NAME VALIDATES WITH NAME . RETURN CODE
+
+    RETURN          shift and go to state 87
+
+
+state 81
+
+    (18) command -> UNLESS NAME VALIDATES WITH PREFIXED_NAME . RETURN CODE
+
+    RETURN          shift and go to state 88
+
+
+state 82
+
+    (15) command -> UNLESS NAME TYPE IS NAME . RETURN CODE
+
+    RETURN          shift and go to state 89
+
+
+state 83
+
+    (16) command -> UNLESS NAME TYPE IS NOT . NAME RETURN CODE
+
+    NAME            shift and go to state 90
+
+
+state 84
+
+    (13) command -> UNLESS TYPE IS NAME RETURN . CODE
+
+    CODE            shift and go to state 91
+
+
+state 85
+
+    (14) command -> UNLESS TYPE IS NOT NAME . RETURN CODE
+
+    RETURN          shift and go to state 92
+
+
+state 86
+
+    (12) values -> values COMMA value .
+
+    RP              reduce using rule 12 (values -> values COMMA value .)
+    COMMA           reduce using rule 12 (values -> values COMMA value .)
+
+
+state 87
+
+    (17) command -> UNLESS NAME VALIDATES WITH NAME RETURN . CODE
+
+    CODE            shift and go to state 93
+
+
+state 88
+
+    (18) command -> UNLESS NAME VALIDATES WITH PREFIXED_NAME RETURN . CODE
+
+    CODE            shift and go to state 94
+
+
+state 89
+
+    (15) command -> UNLESS NAME TYPE IS NAME RETURN . CODE
+
+    CODE            shift and go to state 95
+
+
+state 90
+
+    (16) command -> UNLESS NAME TYPE IS NOT NAME . RETURN CODE
+
+    RETURN          shift and go to state 96
+
+
+state 91
+
+    (13) command -> UNLESS TYPE IS NAME RETURN CODE .
+
+    RP              reduce using rule 13 (command -> UNLESS TYPE IS NAME RETURN CODE .)
+    COMMA           reduce using rule 13 (command -> UNLESS TYPE IS NAME RETURN CODE .)
+    SEMI            reduce using rule 13 (command -> UNLESS TYPE IS NAME RETURN CODE .)
+
+
+state 92
+
+    (14) command -> UNLESS TYPE IS NOT NAME RETURN . CODE
+
+    CODE            shift and go to state 97
+
+
+state 93
+
+    (17) command -> UNLESS NAME VALIDATES WITH NAME RETURN CODE .
+
+    RP              reduce using rule 17 (command -> UNLESS NAME VALIDATES WITH NAME RETURN CODE .)
+    COMMA           reduce using rule 17 (command -> UNLESS NAME VALIDATES WITH NAME RETURN CODE .)
+    SEMI            reduce using rule 17 (command -> UNLESS NAME VALIDATES WITH NAME RETURN CODE .)
+
+
+state 94
+
+    (18) command -> UNLESS NAME VALIDATES WITH PREFIXED_NAME RETURN CODE .
+
+    RP              reduce using rule 18 (command -> UNLESS NAME VALIDATES WITH PREFIXED_NAME RETURN CODE .)
+    COMMA           reduce using rule 18 (command -> UNLESS NAME VALIDATES WITH PREFIXED_NAME RETURN CODE .)
+    SEMI            reduce using rule 18 (command -> UNLESS NAME VALIDATES WITH PREFIXED_NAME RETURN CODE .)
+
+
+state 95
+
+    (15) command -> UNLESS NAME TYPE IS NAME RETURN CODE .
+
+    RP              reduce using rule 15 (command -> UNLESS NAME TYPE IS NAME RETURN CODE .)
+    COMMA           reduce using rule 15 (command -> UNLESS NAME TYPE IS NAME RETURN CODE .)
+    SEMI            reduce using rule 15 (command -> UNLESS NAME TYPE IS NAME RETURN CODE .)
+
+
+state 96
+
+    (16) command -> UNLESS NAME TYPE IS NOT NAME RETURN . CODE
+
+    CODE            shift and go to state 98
+
+
+state 97
+
+    (14) command -> UNLESS TYPE IS NOT NAME RETURN CODE .
+
+    RP              reduce using rule 14 (command -> UNLESS TYPE IS NOT NAME RETURN CODE .)
+    COMMA           reduce using rule 14 (command -> UNLESS TYPE IS NOT NAME RETURN CODE .)
+    SEMI            reduce using rule 14 (command -> UNLESS TYPE IS NOT NAME RETURN CODE .)
+
+
+state 98
+
+    (16) command -> UNLESS NAME TYPE IS NOT NAME RETURN CODE .
+
+    RP              reduce using rule 16 (command -> UNLESS NAME TYPE IS NOT NAME RETURN CODE .)
+    COMMA           reduce using rule 16 (command -> UNLESS NAME TYPE IS NOT NAME RETURN CODE .)
+    SEMI            reduce using rule 16 (command -> UNLESS NAME TYPE IS NOT NAME RETURN CODE .)
+

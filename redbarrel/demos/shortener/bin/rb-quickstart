@@ -1,0 +1,9 @@
+#!/home/tarek/dev/bitbucket.org/redbarrel2/redbarrel/demos/shortener/bin/python
+# EASY-INSTALL-ENTRY-SCRIPT: 'RedBarrel==0.1','console_scripts','rb-quickstart'
+__requires__ = 'RedBarrel==0.1'
+import sys
+from pkg_resources import load_entry_point
+
+sys.exit(
+   load_entry_point('RedBarrel==0.1', 'console_scripts', 'rb-quickstart')()
+)

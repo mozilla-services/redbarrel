@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+  <head>
+    <title>websocket client test -- using Socket.io</title>
+    <script src="js/socket.io.js"></script>
+    <script src="js/json.js"></script> <!-- for ie -->
+  </head>
+  <body>
+      <script>
+    socket = new io.Socket('%(SERVER)s', {port:8000});
+
+    function setupSocket() {
+
+    socket.connect();
+
+    // Add a connect listener
+    socket.on('connect', function() {
+        document.getElementById('status').innerHTML = 'Connected';
+        console.log('Client has connected to the server!');
+    });
+
+    // Add a connect listener
+    socket.on('message', function(data) {
+      obj = JSON.parse(data);
+
+      if ('buffer' in obj) {
+        document.getElementById('form').style.display='block';
+        document.getElementById('chat').innerHTML = '';
+        for (var i in obj.buffer) {
+          _message(obj.buffer[i]);
+        }
+      }
+      else {
+        _message(obj);
+    }
+    });
+
+    // Add a disconnect listener
+    socket.on('disconnect',function() {
+        document.getElementById('status').innerHTML = 'Disconnected';
+        setTimeout(setupSocket, 2000);
+        console.log('The client has disconnected!');
+    });
+
+    };
+
+    // Sends a message to the server via sockets
+    function send(evt) {
+      var msg = document.getElementById('text').value;
+      socket.send(msg);
+      _message({message: ['you', msg]});
+      document.getElementById('text').value = '';
+    };
+
+    function _message(obj){
+        var el = document.createElement('p');
+        if ('announcement' in obj) el.innerHTML = '<em>' + esc(obj.announcement) + '</em>';
+        else if ('message' in obj) el.innerHTML = '<b>' + esc(obj.message[0]) + ':</b> ' + esc(obj.message[1]);
+        document.getElementById('chat').appendChild(el);
+        document.getElementById('chat').scrollTop = 1000000;
+    };
+
+    function esc(msg){
+        return String(msg).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    };
+
+    setupSocket();
+
+   </script>
+
+    <h1>Sample chat client</h1>
+    <div><p id='status'>Connecting...</p></div>
+    <div id="chat"></div>
+    <form id="form" onsubmit="send(); return false">
+      <input type="text" autocomplete="off" id="text"><input type="submit" value="Send">
+    </form>
+
+    <style>
+      #status { background: #ddd; padding: 8px; }
+      #chat { height: 300px; overflow: auto; width: 800px; border: 1px solid #eee; font: 13px Helvetica, Arial; }
+      #chat p { padding: 8px; margin: 0; }
+      #chat p:nth-child(odd) { background: #F6F6F6; }
+      #form { width: 782px; background: #333; padding: 5px 10px; display: none; }
+      #form input[type=text] { width: 700px; padding: 5px; background: #fff; border: 1px solid #fff; }
+      #form input[type=submit] { cursor: pointer; background: #999; border: none; padding: 6px 8px; -moz-border-radius: 8px; -webkit-border-radius: 8px; margin-left: 5px; text-shadow: 0 1px 0 #fff; }
+      #form input[type=submit]:hover { background: #A2A2A2; }
+      #form input[type=submit]:active { position: relative; top: 2px; }
+    </style>
+
+  </body>
+</html>

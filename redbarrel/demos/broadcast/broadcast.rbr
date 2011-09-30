@@ -1,0 +1,24 @@
+meta (
+    description "A WebSocket-powered broadcast",
+    title "RedBarrel Demos"
+);
+
+arbiter socketio python:redbarrel.server.workers.RedBarrelSocketIOWorker;
+socket python:redbarrel.demos.broadcast.broadcast.broadcast;
+
+path media (
+    method GET,
+    url /js/{name},
+    # the content type is automatically set here
+    use directory:media
+);
+
+path broadcast_html (
+    method GET,
+    url /,
+    # the content type is automatically set here
+    use file:broadcast.html,
+    response-body (
+      alter with python:redbarrel.demos.broadcast.broadcast.convert_template
+    )
+);

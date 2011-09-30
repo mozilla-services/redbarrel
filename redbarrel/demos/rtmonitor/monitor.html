@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+  <head>
+    <title>websocket client test -- using Socket.io</title>
+    <script src="js/socket.io.js"></script>
+    <script src="js/json.js"></script> <!-- for ie -->
+    <script src="js/jquery.js"></script>
+    <script src="flot/jquery.flot.js"></script>
+
+  </head>
+  <body>
+    <div id="title" style="background: #ddd; padding: 8px; font-size: 150%;">
+       Realtime monitoring -- <span id='status'>Connecting...</span>
+   </div>
+    <div id="memory_graph" style="width:600px;height:300px; margin: 5px;"></div>
+    <div id="cpu_graph" style="width:600px; height:300px; margin: 5px;"></div>
+
+    <script>
+    socket = new io.Socket('%(SERVER)s', {port:8000});
+
+    function setupSocket() {
+
+    socket.connect();
+    var cpu_tab = [];
+    var memory = [];
+    var free = [];
+    var buffers = [];
+    var cached = [];
+
+    // Add a connect listener
+    socket.on('connect', function() {
+        document.getElementById('status').innerHTML = 'Connected';
+        console.log('Client has connected to the server!');
+    });
+
+    // Add a connect listener
+    socket.on('message', function(data) {
+        obj = JSON.parse(data);
+       var cpu_options = {
+           yaxis: { min: 0, max: 100 },
+           xaxis: { show: false }
+
+       };
+       // drawing the CPU graph
+        if (cpu_tab.length >= 100) {
+            cpu_tab.shift();
+        }
+        cpu_tab.push(obj.cpu);
+        var full = [];
+        for (var pos=0, len=cpu_tab.length; pos<len; ++pos) {
+           full.push([pos+1, cpu_tab[pos]]);
+        }
+
+        $.plot($("#cpu_graph"), [{label: "CPU usage in %", data: full}], cpu_options);
+
+        // drawing the Memory graph
+       var options = {
+           xaxis: { show: false }
+       };
+
+        if (memory.length >= 100) {
+           memory.shift();
+        }
+        memory.push(obj.memory.total);
+        var fmemory = [];
+        for (var pos=0, len=memory.length; pos<len; ++pos) {
+           fmemory.push([pos+1, memory[pos]]);
+        }
+
+        if (free.length >= 100) {
+           free.shift();
+        }
+        free.push(obj.memory.free);
+        var ffree = [];
+        for (var pos=0, len=free.length; pos<len; ++pos) {
+           ffree.push([pos+1, free[pos]]);
+        }
+
+
+        if (buffers.length >= 100) {
+           buffers.shift();
+        }
+        buffers.push(obj.memory.buffers);
+        var fbuffers = [];
+        for (var pos=0, len=buffers.length; pos<len; ++pos) {
+           fbuffers.push([pos+1, buffers[pos]]);
+        }
+
+        if (cached.length >= 100) {
+           cached.shift();
+        }
+
+        cached.push(obj.memory.cached);
+        var fcached = [];
+        for (var pos=0, len=cached.length; pos<len; ++pos) {
+           fcached.push([pos+1, cached[pos]]);
+        }
+
+        $.plot($("#memory_graph"), [{label: "Total Memory in MB", data: fmemory},
+                                    {label: "Free", data: ffree},
+                                    {label: "Buffers", data: fbuffers}, 
+                                    {label: "Cached", data: fcached}], options);
+    });
+
+    // Add a disconnect listener
+    socket.on('disconnect',function() {
+        document.getElementById('status').innerHTML = 'Disconnected';
+        setTimeout(setupSocket, 2000);
+        console.log('The client has disconnected!');
+    });
+
+
+    };
+
+    setupSocket();
+   </script>
+  </body>
+</html>

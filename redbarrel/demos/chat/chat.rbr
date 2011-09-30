@@ -1,0 +1,29 @@
+meta (
+    description "A WebSocket-powered chat",
+    title "RedBarrel Demos"
+);
+
+path socketio (
+    method GET|POST,
+    url /socket.io/{transport:.*?},
+    use python:redbarrel.demos.chat.chat.chat
+);
+
+path media (
+    method GET,
+    url /js/{name},
+    # the content type is automatically set here
+    use directory:media
+);
+
+path chat_html (
+    method GET,
+    url /,
+    # the content type is automatically set here
+    use file:chat.html,
+    response-body (
+      alter with python:redbarrel.demos.chat.chat.convert_template
+    )
+);
+
+

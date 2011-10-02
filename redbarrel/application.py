@@ -34,7 +34,8 @@ def hello(globs, request):
 
 class RedBarrelApplication(object):
     def __init__(self, location=None, rbr_content=_RBR,
-                 app_content=_APP, context=None):
+                 app_content=_APP, context=None,
+                 name='undefined'):
         """
         location contains the application, composed of:
            + an app.rbr file
@@ -57,7 +58,8 @@ class RedBarrelApplication(object):
             self.rbr_content = rbr_content
 
         # rbr file
-        self.app_file = os.path.join(self.root, 'app.py')
+        self.name = name
+        self.app_file = os.path.join(self.root, '%s.py' % self.name)
         if os.path.exists(self.app_file):
             with open(self.app_file) as f:
                 self.app_content = f.read()

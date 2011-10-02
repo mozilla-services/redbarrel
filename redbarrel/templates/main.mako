@@ -10,7 +10,7 @@
  <body>
 
  <div class="header">
- <h1>RedBarrel</h1>
+ <h1>RedBarrel - Dashboard</h1>
  </div>
  <div style="clear:both"></div>
   <div class="sphinxsidebar">

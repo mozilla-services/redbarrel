@@ -8,7 +8,7 @@ import sys
 import mimetypes
 
 from webob.dec import wsgify
-from webob.exc import HTTPNotFound, HTTPFound
+from webob.exc import HTTPFound
 from webob import Response
 
 from redbarrel.appview import AppView
@@ -20,6 +20,7 @@ from webob import Response
 
 _MEDIA = os.path.join(os.path.dirname(__file__), 'media')
 _PREFIXES = ['python', 'file', 'proxy', 'directory']
+_HERE = os.path.dirname(__file__)
 
 _DEFAULT_APP = """\
 root %(root)s;
@@ -33,7 +34,7 @@ meta (
 path default (
  url /,
  method GET,
- use app.default
+ use %(name)s.default
 );
 """
 
@@ -79,7 +80,7 @@ class WebApp(object):
             full = os.path.join(self.appdir, path)
             if not os.path.isdir(full):
                 continue
-            appview = AppView(self, full)
+            appview = AppView(self, full, name=path)
             appview.generate()
             appviews.append((appview.get_root(), appview))
 
@@ -104,10 +105,10 @@ class WebApp(object):
         path = request.path_info[len('/__media__/'):]
         # make sure the path does not start with a dot
         if path.startswith('.') or path.strip() == '.':
-            raise HTTPNotFound()
+            return self._404()
         fullpath = os.path.join(_MEDIA, path)
         if not os.path.exists(fullpath) or not os.path.isfile(fullpath):
-            raise HTTPNotFound()
+            return self._404()
 
         mimetype = mimetypes.guess_type(fullpath)[0]
         with open(fullpath) as f:
@@ -126,16 +127,14 @@ class WebApp(object):
             data = data.replace('\r\n', '\n')   # XXX
             slib.update(data)
 
-        here = os.path.dirname(__file__)
-        tmpl = os.path.join(here, 'templates', 'lib.mako')
+        tmpl = os.path.join(_HERE, 'templates', 'lib.mako')
         with open(tmpl) as f:
             tmpl = Template(f.read())
         return tmpl.render(lib=slib)
 
     def _main(self, request):
         if request.path == '/__main__':
-            here = os.path.dirname(__file__)
-            tmpl = os.path.join(here, 'templates', 'main.mako')
+            tmpl = os.path.join(_HERE, 'templates', 'main.mako')
             with open(tmpl) as f:
                 tmpl = Template(f.read())
 
@@ -150,16 +149,15 @@ class WebApp(object):
                 return '/' + path
 
             data = {}
-            data['name'] = request.POST['name']
+            name = data['name'] = request.POST['name']
             data['root'] = _name2path(data['name'])
             data['description'] = request.POST['description']
             rbr = _DEFAULT_APP % data
             code = _DEFAULT_CODE
-            location = os.path.join(_APPS, data['name'])
+            location = os.path.join(_APPS, name)
             os.mkdir(location)
-
             appview = AppView(wsgiapp=self, location=location,
-                              rbr=rbr, code=code)
+                              rbr=rbr, code=code, name=name)
             appview.generate()
             self.appviews.append((appview.get_root(), appview))
             self.appviews.sort(by_len)
@@ -181,8 +179,7 @@ class WebApp(object):
             url = 'http://%s/__lib__/%s' % (request.environ['HTTP_HOST'], name)
             return HTTPFound(location=url)
 
-
-        raise HTTPNotFound()
+        return self._404()
 
     @wsgify
     def __call__(self, request):
@@ -203,7 +200,14 @@ class WebApp(object):
                 if parts[0] == root.lstrip('/'):
                     return app(request)
 
-        raise HTTPNotFound()
+        return self._404()
+
+    def _404(self):
+        tmpl = os.path.join(_HERE, 'templates', '404.mako')
+        with open(tmpl) as f:
+            tmpl = Template(f.read())
+        body = tmpl.render()
+        return Response(status=404, body=body)
 
 
 if __name__ == '__main__':

@@ -4,6 +4,7 @@
     :license: BSD, see LICENSE for details.
 """
 import os
+import sys
 
 from mako.template import Template
 from webob import Response
@@ -31,18 +32,29 @@ path %(name)s (
 """
 
 class AppView(object):
-    def __init__(self, wsgiapp, location=None, rbr=None, code=None):
+    def __init__(self, wsgiapp, location=None, rbr=None, code=None,
+                 name='undefined'):
         self.wsgiapp = wsgiapp
         self.app = RedBarrelApplication(location=location,
                                         rbr_content=rbr,
                                         app_content=code,
+                                        name=name,
                                         context=self.wsgiapp)   # XXX ugly
 
     def get_root(self):
         return self.app.get_root()
 
     def generate(self):
-        self.app.generate()
+        # XXX meh
+        old = os.getcwd()
+        old_sys = sys.path[:]
+        try:
+            os.chdir(self.app.root)
+            sys.path.insert(0, self.app.root)
+            self.app.generate()
+        finally:
+            os.chdir(old)
+            sys.path[:] = old_sys
 
     def _apis(self):
         return Response(self.app.rbr_content,

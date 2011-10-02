@@ -45,6 +45,11 @@ _UNKNOWN = 0
 _PYTHON = 'py'
 _JS = 'js'
 _ROOT = os.path.join(os.path.dirname(__file__), 'libs')
+_ALLOWED_MODULES = (('json', []),
+                    ('time', []),
+                    ('re', []),
+                    ('StringIO', ['StringIO']),
+                    ('cssmin', []))
 
 
 class VirtualModule(object):
@@ -63,6 +68,8 @@ class VirtualModule(object):
             raise NotImplementedError()
 
         config = SandboxConfig('code')
+        for module, elements in _ALLOWED_MODULES:
+            config.allowModule(module, *elements)
         self.sandbox = Sandbox(config)
         self._load()
 
@@ -70,6 +77,7 @@ class VirtualModule(object):
         self.content = content
         self._load()
         self.sync()
+
 
     def sync(self):
         path = os.path.join(_ROOT, self.name + '.py')

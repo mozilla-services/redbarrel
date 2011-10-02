@@ -13,20 +13,20 @@ If you want to see more demos, send me a mail.
 root /here;
 
 global config file:config.ini;
-global app python:redbarrel.demos.misc.app;
+global app python:misc.app;
 
 path hello_world (
     description "Simplest application: Hello World!",
     method GET,
     url /,
-    use python:redbarrel.demos.misc.hello
+    use python:misc.hello
 );
 
 path counter (
     description "A counter with a persistent state on the server.",
     method GET,
     url /count,
-    use python:redbarrel.demos.misc.counter
+    use python:misc.counter
 );
 
 path counter2 (
@@ -39,7 +39,7 @@ path counter2 (
     """,
     method GET,
     url /count2,
-    use python:redbarrel.demos.misc.counter2
+    use python:misc.counter2
 );
 
 
@@ -47,7 +47,7 @@ path index_html (
     description "A simple html page",
     method GET,
     url /index.html,
-    use python:redbarrel.demos.misc.html,
+    use python:misc.html,
     response-headers (
         set content-type "text/html"
     )
@@ -58,7 +58,7 @@ path capitalize (
 
     method POST,
     url /capitalize,
-    use python:redbarrel.demos.misc.capitalize,
+    use python:misc.capitalize,
 
     request-description "blah",
 
@@ -74,7 +74,7 @@ path capitalize (
     ),
 
     request-headers (
-        unless Authorization validates with python:redbarrel.demos.misc.auth return 401
+        unless Authorization validates with python:misc.auth return 401
     ),
 
     response-headers (
@@ -109,19 +109,19 @@ path compressed_css (
 
     response-body (
         description "The CSS is compressed using cssmin",
-        alter with python:redbarrel.demos.misc.compress_css
+        alter with python:misc.compress_css
     )
 
 );
 
 # demonstrates a custom type
-type blob python:redbarrel.demos.misc.blob;
+type blob python:misc.blob;
 
 path blob (
     description "A web service with a custom type",
     method POST,
     url /blob,
-    use python:redbarrel.demos.misc.blobish,
+    use python:misc.blobish,
     request-body (
         unless type is blob return 400
     )
@@ -137,7 +137,7 @@ path multi (
     description "Allow multiple methods",
     method PUT|GET|POST,
     url /index2.html,
-    use python:redbarrel.demos.misc.html,
+    use python:misc.html,
     response-headers (
         set content-type "text/html"
     )

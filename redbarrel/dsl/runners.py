@@ -114,6 +114,7 @@ def rpython(name, root, url):
         else:
             last_error = None
             last_error_module_path = None
+
     for part in parts[1:]:
         try:
             ret = getattr(ret, part)
@@ -122,6 +123,7 @@ def rpython(name, root, url):
                     and os.path.isfile(last_error_module_path):
                 raise last_error
             raise ImportError(exc)
+
     return ret
 
 

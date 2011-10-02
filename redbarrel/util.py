@@ -144,8 +144,10 @@ def _run_server(args):
     conf = {"address": ("127.0.0.1", args.port),
             "debug": True,
             "memory": True,
-            #"num_workers": args.workers,
-            "path": args.path}
+            "num_workers": 1,  #args.workers,
+            "path": args.path,
+            "timeout": 9000  # XXXX
+            }
 
     for name, num in args.workers:
         # is it an arbiter or a worker ?
@@ -165,54 +167,6 @@ def _run_server(args):
 
     arbiter = Arbiter(conf, specs)
     arbiter.run()
-
-    return
-    if args.workers == 1:
-        from redbarrel.wsgiapp import WebApp
-        from redbarrel.server import RedBarrelSocketIOServer
-        app = WebApp(args.path)
-        server = RedBarrelSocketIOServer(('', args.port), app,
-                                          resource='socket.io',
-                                          policy_server=True, memory=True)
-        try:
-            server.serve_forever()
-        except KeyboardInterrupt:
-            sys.exit(0)
-    else:
-        try:
-            import redis   # NOQA
-        except ImportError:
-            logger.error('You need to install the Redis python client in '
-                         'order to support several workers')
-            sys.exit(0)
-
-        from redbarrel.server import RedBarrelArbiter
-        from redbarrel.server import ZMQ_SUPPORTED
-
-        if not ZMQ_SUPPORTED:
-            logger.warning('0MQ not supported, broacasts will fail.')
-            logger.warning('If you want 0MQ, install pyzmq.')
-
-        from redbarrel.server import BroadcasterWorker
-        from redbarrel.server import FlashPolicyWorker
-
-        from pistil.arbiter import Arbiter
-
-        conf = {"address": ("127.0.0.1", args.port),
-                "debug": True,
-                "num_workers": args.workers,
-                "path": args.path,
-                "receive_port": 5000,
-                "push_port": 5001}
-
-        specs = [(RedBarrelArbiter, 999999, "supervisor", {}, "tcp_pool"),
-                 (FlashPolicyWorker, 30, "worker", {}, "flash")]
-
-        if ZMQ_SUPPORTED:
-            specs.append((BroadcasterWorker, 30, "worker", {}, "0mq"))
-
-        arbiter = Arbiter(conf, specs)
-        arbiter.run()
 
 
 class HTMLFragmentTranslator(HTMLTranslator):

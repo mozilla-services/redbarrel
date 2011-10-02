@@ -31,9 +31,12 @@ path %(name)s (
 """
 
 class AppView(object):
-    def __init__(self, wsgiapp, rbr):
+    def __init__(self, wsgiapp, location=None, rbr=None, code=None):
         self.wsgiapp = wsgiapp
-        self.app = RedBarrelApplication(rbr, self.wsgiapp)   # XXX ugly
+        self.app = RedBarrelApplication(location=location,
+                                        rbr_content=rbr,
+                                        app_content=code,
+                                        context=self.wsgiapp)   # XXX ugly
 
     def get_root(self):
         return self.app.get_root()
@@ -70,7 +73,40 @@ class AppView(object):
                            options=options,
                            rst2HTML=reST2HTML,
                            which_lib=which_lib,
+                           app=self.app,
                            approot=self.app.get_root(),
+                           libs=self.wsgiapp.libraries,
+                           title=title)
+
+    def _editapp(self, request):
+        here = os.path.dirname(__file__)
+        tmpl = os.path.join(here, 'templates', 'appcode.mako')
+        with open(tmpl) as f:
+            tmpl = Template(f.read())
+
+        if request.POST:
+            data  = request.POST['data']
+            data = data.replace('\r\n', '\n')   # XXX
+            self.app.update_code(data)
+            self.app.sync()
+
+        options = self.app.get_options()
+
+        if 'title' in options:
+            title = options['title']
+            if 'version' in options:
+                title += ' v%s' % options['version']
+        else:
+            title = 'Redbarrel Services'
+
+        def which_lib(callable):
+            lib, callable = callable.split('.', 1)
+            return '/__lib__/%s' % lib
+
+        return tmpl.render(app=self.app,
+                           options=options,
+                           rst2HTML=reST2HTML,
+                           which_lib=which_lib,
                            libs=self.wsgiapp.libraries,
                            title=title)
 
@@ -98,6 +134,7 @@ class AppView(object):
                            rst2HTML=reST2HTML,
                            which_lib=which_lib,
                            approot=self.app.get_root(),
+                           app=self.app,
                            libs=self.wsgiapp.libraries,
                            title=title)
 
@@ -111,8 +148,12 @@ class AppView(object):
         editor_path = request.path.split('__editor__/')[-1]
         parts = editor_path.split('/')
 
+        if parts == ['editapp'] and request.method in ('GET', 'POST'):
+            return self._editapp(request)
+
         if parts == ['newpath'] and request.method == 'POST':
             # adding a new path
+
             data = {}
             description = request.POST['description']
             data['description'] = description.replace('\r', '')
@@ -128,7 +169,6 @@ class AppView(object):
                 content_type = request.POST['content-type-value']
             data['content_type'] = content_type
             definition = _PATH % data
-
             try:
                 self.app.add_content(definition)
                 return HTTPFound(location=self.app.get_root() + '/__editor__')

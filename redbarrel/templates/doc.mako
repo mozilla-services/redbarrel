@@ -62,6 +62,8 @@
   ${rst2HTML(options['description'])}
   %endif
 
+  <a href="${approot}/__editor__/editapp">Edit the code</a>
+
   %for name, def_ in defs.items():
   <div class='section service' id="${name}">
      <a class="action" href="${approot}/__editor__/edit/${name}">
@@ -166,15 +168,9 @@
          </ul>
        %endif
       %endif
-
      %endif
-
-
-
-
   </div>
   %endfor
-
 
 <hr/>
 
@@ -242,11 +238,11 @@ $(function() {
   <div>
     <label for="use">Function to use</label>
     <select name="use" id="use">
-    %for lib in libs:
-      %for callable in lib.dir():
-        <option value="${lib.name}.${callable}">${lib.name}.${callable}</option>
+      %for callable in app.module.dir():
+        <option value="app.${callable}">
+           ${callable}
+        </option>
       %endfor
-    %endfor
     </select>
   </div>
   <div><input type="submit"></input></div>

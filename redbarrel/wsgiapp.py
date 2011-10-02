@@ -25,13 +25,25 @@ _DEFAULT_APP = """\
 root %(root)s;
 
 meta (
-    description \"\"\"%(description)s\"\"\",
-    title "%(name)s",
-    version 1.0
+ description \"\"\"%(description)s\"\"\",
+ title "%(name)s",
+ version 1.0
 );
 
-
+path default (
+ url /,
+ method GET,
+ use app.default
+);
 """
+
+_DEFAULT_CODE = """\
+# this is your app code
+
+def default(globs, request):
+    return 'Hello World'
+"""
+
 
 # XXX can be configured
 _LIBS = os.path.join(os.path.dirname(__file__), 'libs')
@@ -57,18 +69,17 @@ class WebApp(object):
     def _load_apps(self):
         appviews = []
         # provided RBRs
-        for rbr in self.rbrs:
-            appview = AppView(self, rbr)
-            appview.generate()
-            appviews.append((appview.get_root(), appview))
+        #for rbr in self.rbrs:
+        #    appview = AppView(self, rbr)
+        #    appview.generate()
+        #    appviews.append((appview.get_root(), appview))
 
         # disk-based RBRs
         for path in os.listdir(self.appdir):
             full = os.path.join(self.appdir, path)
             if not os.path.isdir(full):
                 continue
-            rbr = os.path.join(full, 'definitions.rbr')
-            appview = AppView(self, rbr)
+            appview = AppView(self, full)
             appview.generate()
             appviews.append((appview.get_root(), appview))
 
@@ -143,7 +154,12 @@ class WebApp(object):
             data['root'] = _name2path(data['name'])
             data['description'] = request.POST['description']
             rbr = _DEFAULT_APP % data
-            appview = AppView(self, rbr)
+            code = _DEFAULT_CODE
+            location = os.path.join(_APPS, data['name'])
+            os.mkdir(location)
+
+            appview = AppView(wsgiapp=self, location=location,
+                              rbr=rbr, code=code)
             appview.generate()
             self.appviews.append((appview.get_root(), appview))
             self.appviews.sort(by_len)
@@ -181,11 +197,13 @@ class WebApp(object):
             return self._lib(request)
 
         # pre-matching
-        for root, app in self.appviews:
-            if path.startswith(root):
-                return app(request)
+        parts = [part for part in path.split('/') if part != '']
+        if len(parts) > 0:
+            for root, app in self.appviews:
+                if parts[0] == root.lstrip('/'):
+                    return app(request)
 
-        raise HTTPNotFound(request)
+        raise HTTPNotFound()
 
 
 if __name__ == '__main__':

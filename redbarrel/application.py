@@ -10,6 +10,7 @@ from redbarrel import logger
 from redbarrel.dsl import build_ast
 from redbarrel.dsl.runners import resolve_runner, get_runner_names
 from redbarrel.dsl.mapper import WebMapper
+from redbarrel.vmodules import VirtualModule
 
 
 _MEDIA = os.path.join(os.path.dirname(__file__), 'media')
@@ -17,37 +18,77 @@ _PREFIXES = ['python', 'file', 'proxy', 'directory']
 _NONPATH = ('global', 'type', 'worker', 'arbiter', 'root')
 _ROOT = os.path.join(os.path.dirname(__file__), 'apps')
 
+_RBR = """\
+path default (
+    use python:hello,
+    method GET,
+    url /
+);
+"""
 
-# XXX Need to sync on each edit, in the FS
+_APP = """\
+def hello(globs, request):
+    return 'Hello'
+"""
+
 
 class RedBarrelApplication(object):
-    def __init__(self, rbr, context=None):
-        if os.path.exists(rbr):
-            self.root = os.path.dirname(rbr)
-            with open(rbr) as f:
-                self.rbr_content = f.read()
+    def __init__(self, location=None, rbr_content=_RBR,
+                 app_content=_APP, context=None):
+        """
+        location contains the application, composed of:
+           + an app.rbr file
+           + an app.py file
+
+        If location is not provided, will look into the
+        current dir
+        """
+        if location is not None and os.path.exists(location):
+            self.root = location
         else:
             self.root = os.getcwd()
-            self.rbr_content = rbr
+
+        # rbr file
+        self.rbr_file = os.path.join(self.root, 'app.rbr')
+        if os.path.exists(self.rbr_file):
+            with open(self.rbr_file) as f:
+                self.rbr_content = f.read()
+        else:
+            self.rbr_content = rbr_content
+
+        # rbr file
+        self.app_file = os.path.join(self.root, 'app.py')
+        if os.path.exists(self.app_file):
+            with open(self.app_file) as f:
+                self.app_content = f.read()
+        else:
+            self.app_content = app_content
+
+        self.module = VirtualModule('app', self.app_content)
         self.root_path = ''
         self.context = context
         self._load_rbr()
         self._commitmapper()
 
+    def update_code(self, data):
+        self.app_content = data
+        self.module.update(data)
+
     def sync(self):
-        root = os.path.join(_ROOT, self.root_path.lstrip('/'))
-        if not os.path.exists(root):
-            os.mkdir(root)
         # saving the RBR file
-        rbr = os.path.join(root, 'definitions.rbr')
-        with open(rbr, 'w') as f:
+        with open(self.rbr_file, 'w') as f:
             # XXX should be str all the time
             if isinstance(self.rbr_content, unicode):
                 self.rbr_content = self.rbr_content.encode('utf-8')
             f.write(self.rbr_content)
 
+        # saving the Python file
+        with open(self.app_file, 'w') as f:
+            f.write(self.app_content)
+
     def _commitmapper(self):
         self._rbr_content = None
+        self._app_content = None
         self._ast = None
         self._globs = None
         self._types = None
@@ -56,6 +97,7 @@ class RedBarrelApplication(object):
 
     def _backupmapper(self):
         self._rbr_content = self.rbr_content
+        self._app_content = self.app_content
         self._ast = self.ast
         self._globs = self.globs
         self._types = self.types
@@ -65,6 +107,7 @@ class RedBarrelApplication(object):
         if self._rbr_content is None:
             raise ValueError("Nothing to rollback")
         self.rbr_content = self._rbr_content
+        self._app_content = self.app_content
         self.ast = self._ast
         self.globs = self._globs
         self.types = self._types

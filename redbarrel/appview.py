@@ -45,20 +45,17 @@ class AppView(object):
         return self.app.get_root()
 
     def generate(self):
-        # XXX meh
-        old = os.getcwd()
-        old_sys = sys.path[:]
-        try:
-            os.chdir(self.app.root)
-            sys.path.insert(0, self.app.root)
-            self.app.generate()
-        finally:
-            os.chdir(old)
-            sys.path[:] = old_sys
+        self.app.generate()
 
     def _apis(self):
         return Response(self.app.rbr_content,
                         content_type='text/plain')
+
+    def which_lib(self, callable):
+        lib, callable = callable.split('.', 1)
+        url = '%s/__editor__/editapp?lib=%s' % (self.app.get_root(),
+                                                callable)
+        return url   #'/__lib__/%s' % lib
 
     def _edit(self, path):
         here = os.path.dirname(__file__)
@@ -75,16 +72,13 @@ class AppView(object):
         else:
             title = 'Redbarrel Services'
 
-        def which_lib(callable):
-            lib, callable = callable.split('.', 1)
-            return '/__lib__/%s' % lib
 
         return tmpl.render(path=path,
                            name=path[1],
                            defs=self.app.get_hooks(),
                            options=options,
                            rst2HTML=reST2HTML,
-                           which_lib=which_lib,
+                           which_lib=self.which_lib,
                            app=self.app,
                            approot=self.app.get_root(),
                            libs=self.wsgiapp.libraries,
@@ -111,14 +105,10 @@ class AppView(object):
         else:
             title = 'Redbarrel Services'
 
-        def which_lib(callable):
-            lib, callable = callable.split('.', 1)
-            return '/__lib__/%s' % lib
-
         return tmpl.render(app=self.app,
                            options=options,
                            rst2HTML=reST2HTML,
-                           which_lib=which_lib,
+                           which_lib=self.which_lib,
                            libs=self.wsgiapp.libraries,
                            title=title)
 
@@ -137,14 +127,10 @@ class AppView(object):
         else:
             title = 'Redbarrel Services'
 
-        def which_lib(callable):
-            lib, callable = callable.split('.', 1)
-            return '/__lib__/%s' % lib
-
         return tmpl.render(defs=self.app.get_hooks(),
                            options=options,
                            rst2HTML=reST2HTML,
-                           which_lib=which_lib,
+                           which_lib=self.which_lib,
                            approot=self.app.get_root(),
                            app=self.app,
                            libs=self.wsgiapp.libraries,

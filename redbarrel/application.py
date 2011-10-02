@@ -70,12 +70,7 @@ class RedBarrelApplication(object):
         self.module = VirtualModule('app', self.app_content)
         self.root_path = ''
         self.context = context
-        old = sys.path[:]
-        try:
-            sys.path.insert(0, self.root)
-            self._load_rbr()
-        finally:
-            sys.path[:] = old
+        self._load_rbr()
         self._commitmapper()
 
     def update_code(self, data):
@@ -143,6 +138,7 @@ class RedBarrelApplication(object):
             return value
 
         res = resolve_runner(value, self.root)(*args, **kw)
+
         if value == res:
             raise ImportError(value)
         else:

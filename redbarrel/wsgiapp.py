@@ -212,7 +212,7 @@ class WebApp(object):
 
 if __name__ == '__main__':
     from socketio import SocketIOServer
-    app = WebApp([sys.argv[1]])
+    app = WebApp([sys.argv[1:]])
     server = SocketIOServer(('', 8000), app, resource='socket.io')
     print("Serving on port 8000...")
     server.serve_forever()

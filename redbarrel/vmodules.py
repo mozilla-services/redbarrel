@@ -63,6 +63,7 @@ class VirtualModule(object):
         self.libtype = type
         self.name = name
         self.content = content
+        self.namespace = {}
 
         if type == 'js':
             raise NotImplementedError()
@@ -78,7 +79,6 @@ class VirtualModule(object):
         self._load()
         self.sync()
 
-
     def sync(self):
         path = os.path.join(_ROOT, self.name + '.py')
         with open(path, 'w') as f:
@@ -87,18 +87,18 @@ class VirtualModule(object):
     def _load(self):
         # XXX will scan and load the callables
         #if self.libtype == _PYTHON:
-
-        self.namespace = {'__text': self.content}
-
-        self.sandbox.execute('exec compile(__text, "<string>", "exec")',
-                             locals=self.namespace)
+        #self.namespace = {'__text': self.content}
+        #self.sandbox.execute('exec compile(__text, "<string>", "exec")',
+        #                     locals=self.namespace)
+        exec compile(self.content, self.name, 'exec') in self.namespace
 
     def call(self, function, *args, **kw):
-        return self.sandbox.call(self.namespace[function], *args, **kw)
+        #return self.sandbox.call(self.namespace[function], *args, **kw)
+        return self.namespace[function](*args, **kw)
 
     def dir(self):
         keys = self.namespace.keys()
-        keys.remove('__text')
+        #keys.remove('__text')
         return keys
 
     def doc(self, name):

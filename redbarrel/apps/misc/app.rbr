@@ -92,7 +92,7 @@ path css (
     method GET,
     url /redbarrel.css,
     # the location is absolute or relative to the rbr file
-    use file:../../media/redbarrel.css,
+    use file:redbarrel.css,
     response-headers (
         set content-type "text/css"
     )
@@ -102,7 +102,7 @@ path compressed_css (
     description "Serving a static CSS file",
     method GET,
     url /redbarrel-small.css,
-    use file:../../media/redbarrel.css,
+    use file:redbarrel.css,
     response-headers (
         set content-type "text/css"
     ),

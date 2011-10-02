@@ -7,6 +7,7 @@
 """
 import os
 import urlparse
+import sys
 
 from redbarrel.util import response
 from wsgiproxy.exactproxy import proxy_exact_request
@@ -31,8 +32,7 @@ def register_runner(name):
 
 @register_runner('file')
 def rfile(name, root, url):
-    name = os.path.join(root, name)
-
+    name = os.path.abspath(os.path.join(root, name))
     if not os.path.exists(name):
         raise IOError(name)
 
@@ -87,8 +87,20 @@ def rproxy(name, root, url):
     return __proxy
 
 
+def _save_env(func):
+    def __save_env(*args, **kw):
+        old_sys = sys.path[:]
+        try:
+            return func(*args, **kw)
+        finally:
+            sys.path[:] = old_sys
+    return __save_env
+
+
 @register_runner('python')
+@_save_env
 def rpython(name, root, url):
+    sys.path.insert(0, root)
     parts = name.split('.')
     cursor = len(parts)
     module_name = parts[:cursor]

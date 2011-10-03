@@ -98,6 +98,8 @@ class VirtualModule(object):
 
     def dir(self):
         keys = self.namespace.keys()
+        if '__all__' in keys:
+            return self.namespace['__all__']
         #keys.remove('__text')
         return keys
 

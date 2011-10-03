@@ -33,7 +33,7 @@
       </ul>
     </div>
     <div class="sphinxsidebarwrapper">
-     <h3>My Modules</h3>
+     <h3>Extra Modules</h3>
       <ul>
         <li>
          <ul>

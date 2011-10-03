@@ -13,7 +13,8 @@
  <img src="/__media__/app.png"/>
  <a href="${approot}/__api__"><img src="/__media__/rbr.png"/></a>
  <a href="/__main__"><img src="/__media__/home.png"/></a>
- <h1>${title}</h1>
+ <h1>${title}</h1>  
+
  </div>
  <div style="clear:both"></div>
 
@@ -57,12 +58,10 @@
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body">
-
+<h3><a href="${approot}/__editor__/editapp">Edit the code</a></h3>
   %if 'description' in options:
   ${rst2HTML(options['description'])}
   %endif
-
-  <a href="${approot}/__editor__/editapp">Edit the code</a>
 
   %for name, def_ in defs.items():
   <div class='section service' id="${name}">

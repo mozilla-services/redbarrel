@@ -4,7 +4,6 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>${title}</title>
   <link rel="stylesheet" href="/__media__/redbarrel.css" type='text/css' />
-  <script src="/__media__/jquery.js"></script>
 
  </head>
  <body>
@@ -47,8 +46,6 @@
 
 <div style="clear:both"></div>
  </div>
-
-
       </div>
 
 
@@ -68,21 +65,61 @@
  </script>
  <img class="save" href="#" onclick="save();" src="/__media__/save.png"/>
 
- <form action="." method="POST" id="formsave">
-  <input type="hidden" name="data" id="data" value="EMPTY"/>
- </form>
+<form name="edit_def" method="post"
+      id="edit-ws"
+      action="${approot}/__editor__/edit/${name}">
 
- <div id="editor">${path}</div>
+  <div>Name: <input type="text" name="name" value="${name}"/></div>
+  <div><textarea name="description">${values['description']}</textarea></div>
+  <div>
+     <label for="url">Relative URL</label> <br/>
+     ${approot}<input type="text" name="url" value="${values['url']}" style="width: 80%"/>
 
-    <script src="/__media__/ace.js" type="text/javascript" charset="utf-8"></script>
-    <script src="/__media__/theme-twilight.js" type="text/javascript" charset="utf-8"></script>
+    </div>
 
-    <script>
-    window.onload = function() {
-        window.editor = ace.edit("editor");
-        window.editor.setTheme("ace/theme/twilight");
-    };
-    </script>
+  <div>Allowed methods
+      <input type="checkbox" name="method" value="GET" checked>GET</input>
+      <input type="checkbox" name="method" value="POST">POST</input>
+      <input type="checkbox" name="method" value="PUT">PUT</input>
+      <input type="checkbox" name="method" value="DELETE">DELETE</input>
+      <input type="checkbox" name="method" value="HEAD">HEAD</input>
+  </div>
+  <div>
+    Response Content Type<br/>
+      <input type="radio" name="content-type"
+             value="application/json"
+             id="json" checked="true"/>
+      <label for="json">application/json</label></br>
+
+      <input type="radio" name="content-type" value="text/plain" id="text" />
+      <label for="text">text/plain</label></br>
+
+      <input type="radio" name="content-type" value="text/html" id="html"/>
+      <label for="html">text/html</label></br>
+
+      <input type="radio" name="content-type" value="other"
+         id="other"/>
+    <label for="Other">Other</label>
+
+      <input type="text" name="content-type-value" value="text/acme"/>
+    </div>
+  <div>
+    <label for="use">Function to use</label>
+    <select name="use" id="use">
+      %for callable in app.module.dir():
+       %if '%s.%s' % (name, callable) == values['use']:
+        <option value="${name}.${callable}" selected>
+       %endif
+       %if '%s.%s' % (name, callable) != values['use']:
+        <option value="${name}.${callable}">
+       %endif
+           ${callable}
+        </option>
+      %endfor
+    </select>
+  </div>
+  <div><input type="submit"></input></div>
+</form>
 
 </div>
 </div>

@@ -45,13 +45,16 @@ class RedBarrelApplication(object):
         If location is not provided, will look into the
         current dir
         """
+
         if location is not None and os.path.exists(location):
             self.root = location
         else:
             self.root = os.getcwd()
 
+        self.name = name
+
         # rbr file
-        self.rbr_file = os.path.join(self.root, 'app.rbr')
+        self.rbr_file = os.path.join(self.root, '%s.rbr' % self.name)
         if os.path.exists(self.rbr_file):
             with open(self.rbr_file) as f:
                 self.rbr_content = f.read()
@@ -59,7 +62,6 @@ class RedBarrelApplication(object):
             self.rbr_content = rbr_content
 
         # rbr file
-        self.name = name
         self.app_file = os.path.join(self.root, '%s.py' % self.name)
         if os.path.exists(self.app_file):
             with open(self.app_file) as f:
@@ -67,7 +69,14 @@ class RedBarrelApplication(object):
         else:
             self.app_content = app_content
 
-        self.module = VirtualModule('app', self.app_content)
+        # XXX see how to do this in a more elegant way
+        old = sys.path[:]
+        sys.path.insert(0, self.root)
+        try:
+            self.module = VirtualModule(self.name, self.app_content)
+        finally:
+            sys.path[:] = old
+
         self.root_path = ''
         self.context = context
         self._load_rbr()
@@ -207,7 +216,7 @@ class RedBarrelApplication(object):
     def del_def(self, name):
         new_ast = []
         for definition in self.ast:
-            if definition[0] == 'def' and definition[1] == name:
+            if definition.type == 'def' and definition.left == name:
                 continue
             new_ast.append(definition)
 

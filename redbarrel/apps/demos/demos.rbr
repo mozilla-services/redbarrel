@@ -1,93 +1,146 @@
-# -*- coding: utf-8 -*-
-"""
-    Demos
+meta (
+    description """
+This is just a set of demos to demonstrate **RedBarrel** features.
 
-    :copyright: Copyright 2011 by the RedBarrel team, see AUTHORS.
-    :license: BSD, see LICENSE for details.
-"""
-import json
-import cssmin
+""",
+    title "RedBarrel Demos"
 
+);
 
-#
-# simplest app
-#
-def hello(globs, request):
-    return 'Hello, World'
+root /demos;
 
+global config file:config.ini;
+global app python:demos.app;
 
-#
-# a controller with a state (not thread-safe)
-#
-class CountController(object):
-    def __init__(self):
-        self.counter = 0
+path hello_world (
+    description "Simplest application: Hello World!",
+    method GET,
+    url /,
+    use python:demos.hello
+);
 
-    def __call__(self, globs, request):
-        try:
-            return '%d' % self.counter
-        finally:
-            self.counter += 1
+path counter (
+    description "A counter with a persistent state on the server.",
+    method GET,
+    url /count,
+    use python:demos.counter
+);
 
+path counter2 (
+    description """
+    A counter with a persistent state on the server,
+    using 2 globals:
 
-counter = CountController()
-
-
-# a web page
-def html(globs, req):
-    return """
-    <html>
-      <body>
-        <div>Hello</div>
-      </body>
-    </html>
-    """
+     - a config file
+     - an app that load the config file
+    """,
+    method GET,
+    url /count2,
+    use python:demos.counter2
+);
 
 
-# a web service
-def capitalize(globs, req):
-    return json.dumps(json.loads(req.body).capitalize())
+path index_html (
+    description "A simple html page",
+    method GET,
+    url /index.html,
+    use python:demos.html,
+    response-headers (
+        set content-type "text/html"
+    )
+);
 
+path capitalize (
+    description "A web service with several post/pre processing",
 
-def auth(header):
-    """Authorization check"""
-    if header is None:
-        raise Exception('Unauthorized')
-    # whatever works...
+    method POST,
+    url /capitalize,
+    use python:demos.capitalize,
 
+    request-description "blah",
 
-def compress_css(globs, request, css):
-    """Compress the css using cssmin"""
-    return cssmin.cssmin(css)
+    response-status (
+        describe 200 "Success",
+        describe 400 "The request is probably malformed",
+        describe 401 "Authentication failure"
+    ),
 
+    request-body (
+        description "Send a string in json and the server returns it Capitalized.",
+        unless type is json return 400
+    ),
 
-#
-# a counter using a global + a config file
-#
-class MyApp(object):
-    def __init__(self, globs):
-        self.counter = 0  # int(globs['config'])
+    request-headers (
+        unless Authorization validates with python:demos.auth return 401
+    ),
 
+    response-headers (
+        set content-type "application/json",
+    ),
 
-def app(globs):
-    return MyApp(globs)
+    response-body (
+        description "The string, Capitalized !",
+        unless type is json return 503
+    )
+);
 
+path css (
+    description "Serving a static CSS file",
+    method GET,
+    url /redbarrel.css,
+    # the location is absolute or relative to the rbr file
+    use file:redbarrel.css,
+    response-headers (
+        set content-type "text/css"
+    )
+);
 
-def counter2(globs, request):
-    app = globs['app']
-    try:
-        return '%d' % app.counter
-    finally:
-        app.counter += 1
+path compressed_css (
+    description "Serving a static CSS file",
+    method GET,
+    url /redbarrel-small.css,
+    use file:redbarrel.css,
+    response-headers (
+        set content-type "text/css"
+    ),
 
+    response-body (
+        description "The CSS is compressed using cssmin",
+        alter with python:demos.compress_css
+    )
 
-def blobish(globs, request):
-    return 'OK'
+);
 
+# demonstrates a custom type
+type blob python:demos.blob;
 
-# check and return the new value
-# # XXX not clear yet about converting here
-# and the full rol of this function
-class blob(object):
-    def __call__(self, value):
-        return True
+path blob (
+    description "A web service with a custom type",
+    method POST,
+    url /blob,
+    use python:demos.blobish,
+    request-body (
+        unless type is blob return 400
+    )
+);
+
+#path here (
+#    use proxy:http://localhost:5000,
+#    description "Proxied",
+#    url /proxy
+#);
+
+path multi (
+    description "Allow multiple methods",
+    method PUT|GET|POST,
+    url /index2.html,
+    use python:demos.html,
+    response-headers (
+        set content-type "text/html"
+    )
+);
+
+path dummy (
+    description "Uses a Dummy function by default",
+    url /dummy
+);

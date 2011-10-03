@@ -57,7 +57,7 @@ class AppView(object):
                                                 callable)
         return url   #'/__lib__/%s' % lib
 
-    def _edit(self, path):
+    def _edit(self, path, request):
         here = os.path.dirname(__file__)
         tmpl = os.path.join(here, 'templates', 'edit.mako')
         with open(tmpl) as f:
@@ -72,9 +72,22 @@ class AppView(object):
         else:
             title = 'Redbarrel Services'
 
+        if request.POST:
+            # getting fresh values and replacing the path
+            pass
+
+        values = {}
+        for line in path.right:
+            if line.type == 'assign':
+                if line.left == 'description':
+                    values[line.left] = line.right
+                else:
+                    if not isinstance(line.right, list):
+                        values[line.left.value] = line.right.value
 
         return tmpl.render(path=path,
-                           name=path[1],
+                           values=values,
+                           name=path.left,
                            defs=self.app.get_hooks(),
                            options=options,
                            rst2HTML=reST2HTML,
@@ -182,16 +195,13 @@ class AppView(object):
             path_id = parts[-1]
             path_def = None
             for definition in self.app.ast:
-                if definition[0] == 'def' and definition[1] == path_id:
+                if definition.type == 'def' and definition.left == path_id:
                     path_def = definition
                     break
 
             if path_def is not None:
-                return self._edit(path_def)
+                return self._edit(path_def, request)
 
-        raise NotImplementedError()
-
-    def _edit_path(self, path):
         raise NotImplementedError()
 
     def __call__(self, request):

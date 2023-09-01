@@ -9,10 +9,6 @@ You can quickly set things up with::
     $ python distribute_setup.py
     $ easy_install pip virtualenv
 
-Installing the latest stable RedBarrel release is then done with::
-
-    $ pip install redbarrel
-
 If you want to try the cutting-edge version, grab the repository and
 create a local virtualenv::
 
